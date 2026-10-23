@@ -9,12 +9,13 @@ Atlas digital interaktif untuk membaca **prioritas pengembangan Blue-Green Infra
 ## Sorotan
 
 - **Peta tematik 7 layer** — prioritas BGI, bahaya banjir, tutupan lahan, kemiringan lereng, elevasi, jarak dari sungai, dan batas kecamatan.
+- **Skor parameter 1–5 dari QGIS** — skor asli pada shapefile parameter dan bahaya banjir tampil di bagian **Parameter analisis**, legenda, tooltip peta, dan detail fitur. Skor tidak diubah atau diinventarisasi ulang.
 - **Layer pendukung jaringan jalan RBI 25K** — 883 segmen jalan Kota Cirebon dengan simbol arteri/kolektor magenta, lokal hitam-putih, serta jalan lain/setapak magenta muda mengikuti SNI 6502.2:2010. Layer jalan dapat dinyalakan tanpa mematikan layer tematik.
 - **Satu layer tematik aktif** pada satu waktu agar visual tidak saling menutupi, dengan legenda dan kontrol opasitas per layer.
 - **Warna peta mengikuti konvensi SNI/RBI** — hijau–kuning–oranye–merah untuk kelas prioritas, warna tanah untuk lereng/elevasi, dan biru hanya untuk unsur air. Tema antarmuka web tetap biru.
 - **Filter langsung** berdasarkan kecamatan dan kelas prioritas. Ringkasan area, jumlah fitur, dan grafik ikut menyesuaikan.
 - **Tiga basemap keyless** — Terang, Satelit, dan Gelap — tanpa watermark atau API key.
-- **Detail fitur** saat diklik: kelas prioritas, luas, konteks kecamatan, dan catatan kualitas data.
+- **Detail fitur** saat diklik: kelas, skor parameter, luas, konteks kecamatan, dan catatan kualitas data.
 - **Command palette** (`⌘K` / `Ctrl+K`) untuk berpindah halaman, layer, dan filter.
 - **Responsif penuh** — panel mengambang di desktop, bottom sheet di tablet/ponsel, dan dock navigasi seluler.
 - **Halaman ringkasan, metodologi, dan tentang** untuk membaca angka penting serta batasan analisis.
@@ -28,7 +29,7 @@ Atlas digital interaktif untuk membaca **prioritas pengembangan Blue-Green Infra
 | Peta | MapLibre GL, react-map-gl |
 | Styling | Tailwind CSS v4, Radix UI, Motion |
 | State | Zustand |
-| Data | GeoJSON hasil optimasi dari ekspor qgis2web + shapefile RBI 25K |
+| Data | GeoJSON hasil optimasi ekspor qgis2web + skor shapefile QGIS + shapefile RBI 25K |
 | Grafik | Recharts |
 | Ikon | Phosphor Icons |
 | Deployment | GitHub Actions → GitHub Pages |
@@ -52,7 +53,8 @@ Perintah lain:
 npm run typecheck   # pemeriksaan TypeScript
 npm run build       # build produksi + 404.html + .nojekyll
 npm run preview     # pratinjau build produksi
-npm run data        # regenerasi GeoJSON tematik dari folder legacy/
+npm run data        # regenerasi GeoJSON tematik (termasuk skor parameter)
+npm run data:scores # ekstrak ulang peta skor dari shapefile QGIS sumber
 npm run data:roads  # konversi JALAN_LN_25K/ menjadi public/data/roads.geojson
 ```
 
@@ -68,7 +70,9 @@ Build lokal dapat dipreview di `http://localhost:4173/matkulsip/`.
 │   ├── data/                     # GeoJSON yang sudah dioptimasi
 │   └── favicon.svg
 ├── scripts/
-│   ├── convert-data.mjs          # Ekstraksi, deduplikasi, simplifikasi, ringkasan
+│   ├── convert-data.mjs          # Ekstraksi, deduplikasi, simplifikasi, skor, ringkasan
+│   ├── extract-parameter-scores.mjs # Ekstraksi field skor QGIS ke parameter-scores.json
+│   ├── parameter-scores.json     # Peta kelas → skor hasil ekstraksi shapefile QGIS
 │   ├── convert-roads.mjs         # Konversi shapefile jalan ke GeoJSON + hitung panjang
 │   └── postbuild.mjs             # 404.html + .nojekyll
 ├── src/
@@ -88,27 +92,42 @@ Build lokal dapat dipreview di `http://localhost:4173/matkulsip/`.
 
 ## Data dan pipeline
 
-Data runtime berada di `public/data/` dan dihasilkan dari ekspor qgis2web di `legacy/`:
+Data runtime berada di `public/data/` dan dihasilkan dari ekspor qgis2web di `legacy/`, lalu diperkaya dengan skor dari shapefile QGIS parameter:
 
 | Berkas | Ukuran | Keterangan |
 | --- | ---: | --- |
 | `priority.geojson` | ~130 KB | 12 fitur prioritas BGI |
-| `flood.geojson` | ~250 KB | Bahaya banjir |
+| `flood.geojson` | ~251 KB | Bahaya banjir + skor 1/3/5 |
 | `admin.geojson` | ~47 KB | Batas 5 kecamatan |
-| `factors/landcover.geojson` | ~304 KB | Tutupan lahan |
-| `factors/slope.geojson` | ~126 KB | Kemiringan lereng |
-| `factors/elevation.geojson` | ~417 KB | Elevasi |
-| `factors/river-distance.geojson` | ~293 KB | Jarak dari sungai |
+| `factors/landcover.geojson` | ~306 KB | Tutupan lahan + skor 1–5 |
+| `factors/slope.geojson` | ~127 KB | Kemiringan lereng + skor 1/3/5 |
+| `factors/elevation.geojson` | ~417 KB | Elevasi + skor 1/3/5 |
+| `factors/river-distance.geojson` | ~293 KB | Jarak dari sungai + skor 1/3/5 |
 | `roads.geojson` | ~265 KB | 883 segmen jalan RBI 25K |
-| `summary.json` | — | Angka kanonik untuk UI dan grafik |
+| `summary.json` | — | Angka kanonik untuk UI, legenda, dan grafik |
 
 `scripts/convert-data.mjs` melakukan:
 
 1. ekstraksi geometri dari file JavaScript qgis2web,
 2. normalisasi properti dan nama kelas,
-3. penanganan 24 pasang geometri tutupan lahan yang duplikat,
-4. simplifikasi geometri untuk ukuran file yang lebih kecil,
-5. pembuatan `summary.json` untuk kartu, filter, dan statistik.
+3. penambahan properti `score` dari `scripts/parameter-scores.json`,
+4. penanganan 24 pasang geometri tutupan lahan yang duplikat, termasuk skor tiap kelas asal,
+5. simplifikasi geometri untuk ukuran file yang lebih kecil,
+6. pembuatan `summary.json` untuk kartu, filter, legenda, dan statistik.
+
+`scripts/extract-parameter-scores.mjs` membaca field `skor` pada shapefile di `MATKUL SIP SEMUA PARAMETER DISINI/` dan menulis `scripts/parameter-scores.json`. Folder shapefile sumber tidak disertakan dalam repositori; peta skor hasil ekstraksi disimpan agar data runtime tetap dapat dibangun ulang tanpa folder tersebut.
+
+### Skor parameter
+
+Nilai berikut diambil langsung dari field `skor` pada shapefile QGIS dan tidak diubah:
+
+- **Tutupan lahan** — Permukiman 1; Tegalan 3; Perkebunan/kebun, Semak Belukar, Lahan Kosong 4; Sawah Irigasi, Sawah Tadah Hujan, Sungai, Empang 5.
+- **Kemiringan lereng** — 0–8% 5; 8–15% 3; >15% 1.
+- **Elevasi** — 0–25 m 5; 25–100 m 3; >100 m 1.
+- **Jarak dari sungai** — 0–50 m 5; 50–100 m 3; >100 m 1.
+- **Bahaya banjir** — Rendah 1; Sedang 3; Tinggi 5 (layer konteks, bukan parameter weighted overlay).
+
+Skor 5 pada empat parameter berarti paling mendukung BGI. Skor tersebut bukan skor akhir prioritas; kelas prioritas adalah hasil weighted overlay dan shapefile prioritas tidak memiliki field `skor` akhir.
 
 `scripts/convert-roads.mjs` membaca `JALAN_LN_25K/JALAN_LN_25K.shp` + `.dbf`, mempertahankan kelas dari atribut `REMARK`, menghitung panjang segmen (haversine), membulatkan koordinat ke enam desimal, lalu menulis `public/data/roads.geojson`. Data sumber tidak memiliki nama jalan; atribut yang bermakna hanya kelas jalan.
 
@@ -134,7 +153,7 @@ Warna antarmuka tetap memakai tema biru atlas. Di dalam kanvas peta, warna temat
 
 - Kelas prioritas tinggi dan sangat tinggi mencakup sekitar 70% area analisis. Angka ini perlu dibaca bersama kelas breaks dan metode asli, bukan sebagai rekomendasi lokasi tunggal.
 - Geometri telah disederhanakan untuk performa web. Atlas ini cocok untuk eksplorasi dan komunikasi, bukan pengukuran presisi.
-- Proyek QGIS dan data mentah tidak tersedia di repositori ini, sehingga model weighted overlay tidak dapat diverifikasi ulang secara independen. Sumber data jalan yang tersedia adalah shapefile RBI 25K, bukan data jaringan jalan terbaru.
+- Skor dan kelas parameter mengikuti shapefile QGIS yang disediakan. Proyek QGIS lengkap dan proses weighted overlay tidak disertakan, sehingga perhitungan skor prioritas akhir belum dapat diverifikasi ulang secara independen. Sumber data jalan yang tersedia adalah shapefile RBI 25K, bukan data jaringan jalan terbaru.
 - Nama jalan dan atribut teknis jalan tidak tersedia pada sumber (`NAMRJL` kosong); layer jalan hanya membedakan kelas dari atribut `REMARK`.
 - Basemap Esri digunakan tanpa API key untuk tampilan publik. Untuk kebutuhan produksi berskala besar, pertimbangkan penyedia basemap berlangganan.
 

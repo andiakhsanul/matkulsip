@@ -27,10 +27,19 @@ export interface LegendItem {
   displayLabel: string;
   color: string;
   areaHa?: number;
+  score?: number;
   kind?: "fill" | "line" | "line-dashed";
   casingColor?: string;
   lineWidth?: number;
 }
+
+const SCORED_LAYERS: LayerId[] = [
+  "flood",
+  "landcover",
+  "slope",
+  "elevation",
+  "river",
+];
 
 export function getActiveLayer(layers: Record<LayerId, boolean>): LayerId | null {
   if (layers.priority) return "priority";
@@ -48,7 +57,7 @@ export function displayClassLabel(layer: FactorLayerId | "priority" | "flood", l
     if (label === "25-100") return "25–100 m";
     if (label === ">100") return ">100 m";
   }
-  if (layer === "slope") {
+  if (layer === "slope" || layer === "river") {
     return label.replace("-", "–");
   }
   return label;
@@ -69,6 +78,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
       displayLabel: item.label,
       color: FLOOD_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
+      score: item.score,
     }));
   }
   if (layer === "roads") {
@@ -92,6 +102,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
       displayLabel: item.label,
       color: LANDCOVER_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
+      score: item.score,
     }));
   }
   if (layer === "slope") {
@@ -100,6 +111,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
       displayLabel: displayClassLabel("slope", item.label),
       color: SLOPE_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
+      score: item.score,
     }));
   }
   if (layer === "elevation") {
@@ -108,6 +120,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
       displayLabel: displayClassLabel("elevation", item.label),
       color: ELEVATION_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
+      score: item.score,
     }));
   }
   if (layer === "river") {
@@ -116,6 +129,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
       displayLabel: displayClassLabel("river", item.label),
       color: RIVER_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
+      score: item.score,
     }));
   }
   return [];
@@ -133,6 +147,23 @@ export function layerClassLabel(layer: LayerId, value: unknown) {
 export function getLayerValue(layer: LayerId, properties: Record<string, unknown>) {
   const property = LAYER_META[layer].property;
   return layerClassLabel(layer, properties[property]);
+}
+
+export function getLayerScore(layer: LayerId, properties: Record<string, unknown>) {
+  if (!SCORED_LAYERS.includes(layer)) return null;
+  const score = Number(properties.score);
+  return Number.isFinite(score) ? score : null;
+}
+
+export function scoreRange(items: LegendItem[]) {
+  const scores = items
+    .map((item) => item.score)
+    .filter((score): score is number => typeof score === "number");
+  if (!scores.length) return null;
+  return {
+    min: Math.min(...scores),
+    max: Math.max(...scores),
+  };
 }
 
 export function filterPriorityFeatures(

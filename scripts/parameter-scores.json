@@ -1,0 +1,57 @@
+{
+  "source": "MATKUL SIP SEMUA PARAMETER DISINI",
+  "field": "skor",
+  "layers": {
+    "landcover": {
+      "source": "Tutupan Lahan Cirebon New.shp",
+      "classField": "Landuse_fi",
+      "scores": {
+        "Empang": 5,
+        "Lahan Kosong": 4,
+        "Perkebunan/kebun": 4,
+        "Permukiman": 1,
+        "Sawah Irigasi": 5,
+        "Sawah Tadah Hujan": 5,
+        "Semak Belukar": 4,
+        "Sungai": 5,
+        "Tegalan": 3
+      }
+    },
+    "slope": {
+      "source": "Kemiringan Lereng Cirebon New.shp",
+      "classField": "slope",
+      "scores": {
+        ">15%": 1,
+        "0-8%": 5,
+        "8-15%": 3
+      }
+    },
+    "elevation": {
+      "source": "Ketinggian Lahan Cirebon New.shp",
+      "classField": "ket",
+      "scores": {
+        ">100": 1,
+        "0-25": 5,
+        "25-100": 3
+      }
+    },
+    "river": {
+      "source": "Jarak Sungai Cirebon New.shp",
+      "classField": "keterangan",
+      "scores": {
+        ">100 m": 1,
+        "0-50 m": 5,
+        "50-100 m": 3
+      }
+    },
+    "flood": {
+      "source": "Bahaya Banjir Cirebon New.shp",
+      "classField": "Keterangan",
+      "scores": {
+        "Rendah": 1,
+        "Sedang": 3,
+        "Tinggi": 5
+      }
+    }
+  }
+}

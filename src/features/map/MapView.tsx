@@ -25,7 +25,12 @@ import {
   BASEMAP_ORDER,
 } from "@/lib/basemaps";
 import { LAYER_META } from "@/lib/constants";
-import { getActiveLayer, getLayerValue, legendColor } from "@/lib/layers";
+import {
+  getActiveLayer,
+  getLayerScore,
+  getLayerValue,
+  legendColor,
+} from "@/lib/layers";
 import { cn, formatArea, formatNumber } from "@/lib/format";
 import {
   BASEMAP_BACKGROUND,
@@ -125,11 +130,22 @@ function selectedFromFeature(
 function FeatureTooltip({ hover }: { hover: HoverState }) {
   const meta = LAYER_META[hover.layer];
   const value = getLayerValue(hover.layer, hover.properties);
+  const score = getLayerScore(hover.layer, hover.properties);
   const area = Number(hover.properties.areaHa);
   const duplicate = hover.layer === "landcover" && Boolean(hover.properties.duplicate);
   const classes = Array.isArray(hover.properties.classes)
     ? (hover.properties.classes as string[])
     : [];
+  const classScores =
+    hover.properties.classScores && typeof hover.properties.classScores === "object"
+      ? (hover.properties.classScores as Record<string, number>)
+      : null;
+  const classSummary = classes
+    .map((label) => {
+      const classScore = classScores?.[label];
+      return typeof classScore === "number" ? `${label} (${classScore})` : label;
+    })
+    .join(" / ");
   const left = Math.min(hover.x + 18, window.innerWidth - 278);
   const top = Math.max(16, hover.y - 24);
 
@@ -150,7 +166,7 @@ function FeatureTooltip({ hover }: { hover: HoverState }) {
           {String(hover.properties.kecamatan ?? "")}
         </span>
       </div>
-      <div className="mt-2 flex items-center gap-2">
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {hover.layer === "priority" ? (
           <PriorityBadge label={hover.properties.priority as never} />
         ) : (
@@ -167,13 +183,19 @@ function FeatureTooltip({ hover }: { hover: HoverState }) {
             {formatArea(area)}
           </span>
         )}
+        {score !== null && (
+          <span
+            className="ml-auto rounded-full bg-blue-500/10 px-1.5 py-0.5 font-mono text-[8.5px] font-semibold text-blue-700"
+            title="Skor parameter dari atribut QGIS"
+          >
+            skor {score}
+          </span>
+        )}
       </div>
       {duplicate && (
         <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-amber-500/10 px-2 py-1.5 text-[9.5px] leading-snug text-[#8b5b0f]">
           <Warning size={12} weight="fill" className="mt-0.5 shrink-0" />
-          <span>
-            Geometri duplikat. Kelas asal: {classes.join(" / ")}.
-          </span>
+          <span>Geometri duplikat. Kelas asal: {classSummary}.</span>
         </div>
       )}
       <div className="mt-2 flex items-center justify-between border-t border-mist-100 pt-2 text-[9px] text-ink-faint">

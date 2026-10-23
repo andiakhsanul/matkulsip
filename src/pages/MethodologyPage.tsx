@@ -26,7 +26,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useData } from "@/providers/DataProvider";
+import { displayClassLabel } from "@/lib/layers";
 import { formatArea, formatNumber, formatPercent } from "@/lib/format";
+import type { FactorLayerId, SummaryValue } from "@/types";
 
 const weightIcons: Record<string, React.ReactNode> = {
   landcover: <Plant size={18} weight="fill" />,
@@ -44,7 +46,7 @@ const steps = [
   {
     number: "02",
     title: "Reklasifikasi & skoring",
-    text: "Setiap parameter diterjemahkan menjadi kelas yang dapat dibandingkan. Nilai kelas mengikuti analisis asli dan tidak diubah pada atlas ini.",
+    text: "Setiap parameter diterjemahkan menjadi kelas dengan skor 1–5 dari atribut skor shapefile QGIS. Nilainya tidak diubah pada atlas ini.",
   },
   {
     number: "03",
@@ -174,6 +176,71 @@ function WeightCards() {
         </Reveal>
       ))}
     </div>
+  );
+}
+
+function ScoreMatrix() {
+  const { metadata, summary } = useData();
+  const classesByKey: Record<string, SummaryValue[]> = {
+    landcover: summary.landcover.classes,
+    slope: summary.factors.slope,
+    elevation: summary.factors.elevation,
+    river: summary.factors.riverDistance,
+  };
+
+  return (
+    <Reveal className="mt-3">
+      <div className="rounded-[26px] border border-mist-200/70 bg-white p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="flex items-center gap-1.5 font-mono text-[8.5px] uppercase tracking-[0.15em] text-ink-faint">
+              <Stack size={12} weight="fill" className="text-blue-600" />
+              Skor parameter
+            </p>
+            <h3 className="mt-1.5 text-[17px] font-bold tracking-[-0.035em] text-ink">
+              Nilai kelas dari shapefile QGIS.
+            </h3>
+          </div>
+          <Badge tone="blue">field skor · 1–5</Badge>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {metadata.weights.map((weight) => {
+            const items = classesByKey[weight.key] ?? [];
+            return (
+              <div key={weight.key} className="rounded-2xl bg-mist-50/75 p-3">
+                <p className="text-[10px] font-bold text-ink">{weight.label}</p>
+                <div className="mt-2 space-y-1.5">
+                  {items.map((item) => (
+                    <div
+                      key={item.label}
+                      className="flex items-center justify-between gap-2"
+                    >
+                      <span
+                        className="min-w-0 truncate text-[9.5px] text-ink-soft"
+                        title={item.label}
+                      >
+                        {displayClassLabel(weight.key as FactorLayerId, item.label)}
+                      </span>
+                      <span className="shrink-0 rounded-md bg-blue-500/10 px-1.5 py-0.5 font-mono text-[8px] font-semibold text-blue-700">
+                        skor {item.score ?? "—"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-4 flex items-start gap-2 rounded-xl bg-mist-50 px-3 py-2.5 text-[9px] leading-relaxed text-ink-soft">
+          <Info size={12} className="mt-0.5 shrink-0 text-blue-600" />
+          <span>
+            Skor 5 menunjukkan kelas yang paling mendukung BGI. Skor parameter
+            bukan skor akhir prioritas: nilai akhir dihitung melalui weighted
+            overlay dengan bobot 40% / 25% / 25% / 10%.
+          </span>
+        </div>
+      </div>
+    </Reveal>
   );
 }
 
@@ -330,7 +397,7 @@ function Limitations() {
     },
     {
       title: "Data mentah tidak lengkap",
-      text: "Proyek QGIS dan data sumber mentah tidak tersedia di repositori ini. Verifikasi bobot, skor, dan break kelas hanya dapat dilakukan dari ekspor qgis2web.",
+      text: "Skor parameter mengikuti shapefile QGIS yang disediakan. Proyek QGIS lengkap tidak disertakan, sehingga proses weighted overlay belum dapat dijalankan ulang secara independen.",
     },
     {
       title: "Skala dan sumber",
@@ -383,6 +450,7 @@ export function MethodologyPage() {
             </p>
           </div>
           <WeightCards />
+          <ScoreMatrix />
         </section>
 
         <section className="mt-14">

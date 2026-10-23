@@ -132,7 +132,7 @@ export const LAYER_META: Record<
     label: "Tutupan lahan",
     shortLabel: "Tutupan lahan",
     description:
-      "Jenis tutupan lahan di Kota Cirebon. Bobot 40% dalam analisis asli.",
+      "Jenis tutupan lahan di Kota Cirebon. Bobot 40%; skor QGIS 1–5.",
     group: "factor",
     property: "landcover",
     color: "#79a862",
@@ -141,7 +141,7 @@ export const LAYER_META: Record<
     label: "Kemiringan lereng",
     shortLabel: "Kemiringan",
     description:
-      "Kelas kemiringan lereng 0–8%, 8–15%, dan >15%. Bobot 25%.",
+      "Kelas lereng 0–8%, 8–15%, dan >15%. Bobot 25%; skor 5 untuk datar, 1 untuk curam.",
     group: "factor",
     property: "slopeClass",
     color: "#dda15e",
@@ -150,7 +150,7 @@ export const LAYER_META: Record<
     label: "Ketinggian lahan",
     shortLabel: "Elevasi",
     description:
-      "Kelas elevasi 0–25 m, 25–100 m, dan >100 m. Bobot 25%.",
+      "Kelas elevasi 0–25 m, 25–100 m, dan >100 m. Bobot 25%; skor 5 untuk 0–25 m, 1 untuk >100 m.",
     group: "factor",
     property: "elevationClass",
     color: "#d4b071",
@@ -159,7 +159,7 @@ export const LAYER_META: Record<
     label: "Jarak dari sungai",
     shortLabel: "Jarak sungai",
     description:
-      "Kelas jarak 0–50 m, 50–100 m, dan >100 m dari badan air. Bobot 10%.",
+      "Jarak 0–50 m, 50–100 m, dan >100 m dari badan air. Bobot 10%; skor 5 untuk 0–50 m, 1 untuk >100 m.",
     group: "factor",
     property: "distanceClass",
     color: "#2f7d32",
@@ -168,7 +168,7 @@ export const LAYER_META: Record<
     label: "Bahaya banjir",
     shortLabel: "Bahaya banjir",
     description:
-      "Layer konteks tingkat bahaya banjir. Tidak termasuk dalam empat parameter weighted overlay.",
+      "Layer konteks bahaya banjir; tidak termasuk empat parameter weighted overlay. Skor 5 = bahaya tinggi.",
     group: "context",
     property: "hazard",
     color: "#f59e42",

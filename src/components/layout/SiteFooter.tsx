@@ -7,7 +7,7 @@ import { useData } from "@/providers/DataProvider";
 import { formatDate } from "@/lib/format";
 
 export function SiteFooter() {
-  const { summary } = useData();
+  const { metadata, summary } = useData();
   return (
     <footer className="mt-24 border-t border-mist-200/70 bg-white/55">
       <PageShell className="py-12 sm:py-16">
@@ -52,9 +52,9 @@ export function SiteFooter() {
               Data & kredit
             </p>
             <p className="mt-3 text-[10.5px] leading-relaxed text-ink-soft">
-              Analisis weighted overlay BGI Kota Cirebon. Geometri dan atribut
-              mengikuti ekspor qgis2web asli. Basemap oleh Esri dan
-              OpenStreetMap.
+              Analisis weighted overlay BGI Kota Cirebon. Geometri mengikuti
+              ekspor qgis2web asli dan skor parameter diambil dari shapefile
+              QGIS. Basemap oleh Esri dan OpenStreetMap.
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <a
@@ -67,7 +67,7 @@ export function SiteFooter() {
                 Repositori
               </a>
               <span className="font-mono text-[8.5px] text-ink-faint">
-                v1.0 · {formatDate(summary.generatedAt)}
+                v{metadata.version} · {formatDate(summary.generatedAt)}
               </span>
             </div>
           </div>

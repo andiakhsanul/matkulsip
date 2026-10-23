@@ -9,6 +9,7 @@ import {
   MapPin,
   MapPinLine,
   ShareNetwork,
+  Sparkle,
   Warning,
   X,
 } from "@phosphor-icons/react";
@@ -18,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useData } from "@/providers/DataProvider";
 import { useAppStore } from "@/stores/useAppStore";
 import { LAYER_META, PRIORITY_ORDER } from "@/lib/constants";
-import { getLayerValue, legendColor } from "@/lib/layers";
+import { getLayerScore, getLayerValue, legendColor } from "@/lib/layers";
 import {
   cn,
   formatArea,
@@ -219,9 +220,10 @@ function PriorityDetail({
           </span>
         </div>
         <p className="mt-1.5 text-[10px] leading-relaxed text-white/65">
-          Skor berasal dari weighted overlay empat parameter. Bobot mengikuti
-          analisis asli; kelas adalah hasil klasifikasi, bukan rekomendasi
-          intervensi final.
+          Skor parameter 1–5 tersedia pada layer empat parameter. Shapefile
+          prioritas tidak memuat field skor akhir, sehingga kelas prioritas
+          ditampilkan tanpa nilai numerik. Bobot mengikuti analisis asli; kelas
+          bukan rekomendasi intervensi final.
         </p>
         <div className="mt-2.5 grid grid-cols-2 gap-1.5">
           {[
@@ -271,12 +273,24 @@ function GenericDetail({ selected }: { selected: SelectedFeature }) {
   const meta = LAYER_META[selected.layer];
   const properties = selected.properties as unknown as Record<string, unknown>;
   const value = getLayerValue(selected.layer, properties);
+  const score = getLayerScore(selected.layer, properties);
+  const scoreLabel = selected.layer === "flood" ? "Skor bahaya" : "Skor parameter";
   const area = Number(properties.areaHa);
   const duplicate =
     selected.layer === "landcover" && Boolean(properties.duplicate);
   const classes = Array.isArray(properties.classes)
     ? (properties.classes as string[])
     : [];
+  const classScores =
+    properties.classScores && typeof properties.classScores === "object"
+      ? (properties.classScores as Record<string, number>)
+      : null;
+  const classSummary = classes
+    .map((label) => {
+      const classScore = classScores?.[label];
+      return typeof classScore === "number" ? `${label} (skor ${classScore})` : label;
+    })
+    .join(" / ");
 
   const zoom = () => {
     if (!selected.center) return;
@@ -316,6 +330,18 @@ function GenericDetail({ selected }: { selected: SelectedFeature }) {
             <span className="text-[13px] font-bold text-ink">{formatArea(area)}</span>
           </div>
         )}
+        {score !== null && (
+          <div className="mt-1.5 flex items-center justify-between rounded-xl border border-blue-500/15 bg-blue-500/[0.055] px-3 py-2">
+            <span className="flex items-center gap-1.5 text-[9px] font-semibold text-blue-800">
+              <Sparkle size={11} weight="fill" className="text-blue-600" />
+              {scoreLabel}
+            </span>
+            <span className="font-mono text-[13px] font-bold text-blue-800">
+              {score}
+              <span className="ml-0.5 text-[8px] font-medium text-blue-700/60">/5</span>
+            </span>
+          </div>
+        )}
         <p className="mt-2.5 text-[10px] leading-relaxed text-ink-soft">
           {meta.description}
         </p>
@@ -333,7 +359,7 @@ function GenericDetail({ selected }: { selected: SelectedFeature }) {
               </p>
               <p className="mt-1 text-[9px] leading-relaxed text-[#99610c]/85">
                 Geometri ini muncul dengan dua kelas di data sumber:{" "}
-                <strong className="font-semibold">{classes.join(" / ")}</strong>.
+                <strong className="font-semibold">{classSummary}</strong>.
                 Kelas yang ditampilkan mengikuti fitur teratas pada ekspor asli.
               </p>
               <Link
@@ -374,8 +400,9 @@ function GenericDetail({ selected }: { selected: SelectedFeature }) {
           variant="outline"
           size="sm"
           onClick={() => {
+            const scoreText = score !== null ? ` · skor ${score}/5` : "";
             void navigator.clipboard
-              .writeText(`${meta.label} · ${value} · ${formatArea(area)}`)
+              .writeText(`${meta.label} · ${value}${scoreText} · ${formatArea(area)}`)
               .then(() => toast.success("Detail layer disalin"));
           }}
         >
@@ -400,7 +427,7 @@ export function DetailContent({
   onClose?: () => void;
   compact?: boolean;
 }) {
-  const { summary } = useData();
+  const { summary, metadata } = useData();
   const navigate = useNavigate();
 
   return (
@@ -452,7 +479,7 @@ export function DetailContent({
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-mist-100 px-1 pt-2.5">
         <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-ink-faint">
-          Data analisis BGI · v1.0
+          Data analisis BGI · v{metadata.version}
         </span>
         <button
           type="button"

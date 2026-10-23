@@ -43,13 +43,16 @@ export function LegendList({
 }) {
   const items = legendForLayer(layer, summary);
   if (!items.length) return null;
-  const hasArea = items.some((item) => typeof item.areaHa === "number");
+  const hasArea = items.some(
+    (item) => typeof item.areaHa === "number" && item.areaHa > 0
+  );
+  const hasScores = items.some((item) => typeof item.score === "number");
 
   return (
     <div
       className={cn(
         "grid gap-x-3 gap-y-2",
-        compact || layer === "landcover" ? "grid-cols-2" : "grid-cols-2"
+        hasScores || compact === false ? "grid-cols-1" : "grid-cols-2"
       )}
     >
       {items.map((item) => (
@@ -88,21 +91,41 @@ export function LegendList({
           <span className="min-w-0 flex-1 truncate font-medium text-ink">
             {item.displayLabel}
           </span>
-          {typeof item.areaHa === "number" && (
+          {typeof item.score === "number" && (
+            <span
+              className="shrink-0 rounded-md bg-blue-500/10 px-1.5 py-0.5 font-mono text-[8px] font-semibold text-blue-700"
+              title={`Skor parameter dari atribut QGIS: ${item.score}`}
+            >
+              skor {item.score}
+            </span>
+          )}
+          {typeof item.areaHa === "number" && item.areaHa > 0 && (
             <span className="shrink-0 font-mono text-[9px] text-ink-faint">
               {formatNumber(item.areaHa, 0)}
             </span>
           )}
         </div>
       ))}
-      {hasArea && (
-        <div className="col-span-2 mt-0.5 flex items-center gap-1.5 text-[9px] text-ink-faint">
+      {hasScores && (
+        <div className="mt-0.5 flex items-start gap-1.5 text-[9px] leading-relaxed text-ink-faint">
+          <Info size={10} className="mt-0.5 shrink-0" />
+          <span>
+            Skor 1–5 berasal dari atribut QGIS.{" "}
+            {layer === "flood"
+              ? "Skor 5 = bahaya tertinggi."
+              : "Skor 5 = paling mendukung BGI."}
+            {hasArea ? " Angka kanan adalah luas (ha)." : ""}
+          </span>
+        </div>
+      )}
+      {hasArea && !hasScores && (
+        <div className="mt-0.5 flex items-center gap-1.5 text-[9px] text-ink-faint">
           <Info size={10} />
           Angka menunjukkan luas dalam hektare.
         </div>
       )}
       {layer === "roads" && (
-        <div className="col-span-2 mt-0.5 flex items-center gap-1.5 text-[9px] text-ink-faint">
+        <div className="mt-0.5 flex items-center gap-1.5 text-[9px] text-ink-faint">
           <Info size={10} />
           Simbol jalan mengikuti SNI 6502.2:2010.
         </div>

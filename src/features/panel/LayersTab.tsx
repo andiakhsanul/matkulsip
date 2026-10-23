@@ -25,6 +25,7 @@ import {
   FACTOR_LAYERS,
   LAYER_META,
 } from "@/lib/constants";
+import { legendForLayer, scoreRange } from "@/lib/layers";
 import { cn, formatArea, formatNumber, formatPercent } from "@/lib/format";
 import { LayerIcon } from "@/features/panel/layerIcons";
 import {
@@ -188,6 +189,12 @@ function LayerRow({ id, summary }: { id: LayerId; summary: ReturnType<typeof use
   const { metadata, data } = useData();
 
   const weight = metadata.weights.find((item) => item.key === id)?.weight;
+  const legend = legendForLayer(id, summary);
+  const scores = scoreRange(legend);
+  const scoreTitle = legend
+    .filter((item) => typeof item.score === "number")
+    .map((item) => `${item.displayLabel} ${item.score}`)
+    .join(" · ");
   const isFactor = (FACTOR_LAYERS as LayerId[]).includes(id);
   const isLoading = data[id] === null && active;
   const showLegend =
@@ -224,6 +231,14 @@ function LayerRow({ id, summary }: { id: LayerId; summary: ReturnType<typeof use
             {typeof weight === "number" && (
               <span className="rounded-md bg-mist-100 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.06em] text-ink-faint">
                 bobot {weight}%
+              </span>
+            )}
+            {scores && (
+              <span
+                className="rounded-md bg-blue-500/10 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.06em] text-blue-700"
+                title={scoreTitle ? `Skor QGIS — ${scoreTitle}` : undefined}
+              >
+                skor {scores.min}–{scores.max}
               </span>
             )}
             {id === "roads" && (
@@ -340,12 +355,20 @@ export function LayersTab() {
       <PriorityHero />
 
       <section>
-        <SectionLabel meta="4 parameter">Parameter analisis</SectionLabel>
+        <SectionLabel meta="4 parameter · skor 1–5">Parameter analisis</SectionLabel>
         <div className="space-y-1.5">
           {FACTOR_LAYERS.map((id) => (
             <LayerRow key={id} id={id} summary={summary} />
           ))}
         </div>
+        <p className="mt-2 flex items-start gap-1.5 px-0.5 text-[9px] leading-relaxed text-ink-faint">
+          <Info size={10} className="mt-0.5 shrink-0 text-blue-600" />
+          <span>
+            Skor 1–5 diambil langsung dari atribut <span className="font-mono">skor</span>{" "}
+            pada shapefile QGIS. Untuk empat parameter, skor lebih tinggi berarti
+            lebih mendukung BGI.
+          </span>
+        </p>
       </section>
 
       <section>

@@ -44,6 +44,7 @@ export interface FloodProperties {
   kecamatan: string;
   hazard: "Rendah" | "Sedang" | "Tinggi";
   areaHa: number;
+  score: number;
 }
 
 export interface RoadProperties {
@@ -64,8 +65,10 @@ export interface LandcoverProperties {
   kecamatan: string;
   landcover: string;
   classes: string[];
+  classScores?: Record<string, number>;
   duplicate: boolean;
   areaHa: number;
+  score: number;
 }
 
 export interface SlopeProperties {
@@ -73,18 +76,21 @@ export interface SlopeProperties {
   kecamatan: string;
   slopeClass: "0-8%" | "8-15%" | ">15%";
   classification?: string;
+  score: number;
 }
 
 export interface ElevationProperties {
   id: string;
   kecamatan: string;
   elevationClass: "0-25" | "25-100" | ">100";
+  score: number;
 }
 
 export interface RiverProperties {
   id: string;
   kecamatan: string;
   distanceClass: "0-50 m" | "50-100 m" | ">100 m";
+  score: number;
 }
 
 export type PriorityFeature = Feature<MultiPolygon, PriorityProperties>;
@@ -130,10 +136,14 @@ export type SelectedFeature = (
   center?: [number, number];
 };
 
-export interface SummaryClass {
-  key: string;
+export interface SummaryValue {
   label: string;
   areaHa: number;
+  score?: number;
+}
+
+export interface SummaryClass extends SummaryValue {
+  key: string;
   pct: number;
   count: number;
   color: string;
@@ -169,7 +179,7 @@ export interface SummaryData {
   };
   flood: {
     totalAreaHa: number;
-    classes: { label: string; areaHa: number }[];
+    classes: SummaryValue[];
   };
   landcover: {
     sourceFeatures: number;
@@ -178,12 +188,12 @@ export interface SummaryData {
     duplicateFeatures: number;
     sourceAreaHa: number;
     uniqueAreaHa: number;
-    classes: { label: string; areaHa: number }[];
+    classes: SummaryValue[];
   };
   factors: {
-    slope: { label: string; areaHa: number }[];
-    elevation: { label: string; areaHa: number }[];
-    riverDistance: { label: string; areaHa: number }[];
+    slope: SummaryValue[];
+    elevation: SummaryValue[];
+    riverDistance: SummaryValue[];
   };
   adminCentroids: { kecamatan: string; center: [number, number]; areaHa: number }[];
 }

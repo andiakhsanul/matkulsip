@@ -52,7 +52,7 @@ const bgiPillars = [
 ];
 
 function Hero() {
-  const { summary } = useData();
+  const { metadata, summary } = useData();
   return (
     <section className="relative overflow-hidden border-b border-mist-200/60 bg-gradient-to-b from-white to-mist-50">
       <ContourBackground className="-right-32 -top-40 h-[680px] w-[900px] text-aqua-500/14" />
@@ -94,7 +94,7 @@ function Hero() {
               <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full border border-white/8" />
               <div className="relative flex items-start justify-between">
                 <BrandMark className="h-14 w-14" />
-                <Badge tone="glass">2026 · v1.0</Badge>
+                <Badge tone="glass">2026 · v{metadata.version}</Badge>
               </div>
               <p className="relative mt-6 font-mono text-[8.5px] uppercase tracking-[0.17em] text-white/35">
                 Blue-Green Infrastructure
@@ -187,8 +187,9 @@ function Credits() {
             <Badge tone="blue">{metadata.legacy}</Badge>
           </div>
           <p className="mt-3 text-[10px] leading-relaxed text-ink-soft">
-            Geometri dan atribut berasal dari ekspor qgis2web proyek analisis
-            BGI Kota Cirebon. Antarmuka atlas dikembangkan ulang dengan React,
+            Geometri berasal dari ekspor qgis2web proyek analisis BGI Kota
+            Cirebon, sedangkan skor parameter 1–5 diambil dari field skor
+            shapefile QGIS. Antarmuka atlas dikembangkan ulang dengan React,
             MapLibre GL, dan Vite. Basemap disediakan oleh Esri dan
             OpenStreetMap.
           </p>
@@ -269,7 +270,7 @@ function ReadingGuide() {
     {
       number: "02",
       title: "Uji dengan parameter",
-      text: "Buka layer tutupan lahan, lereng, elevasi, atau jarak sungai untuk melihat konteks di balik skor.",
+      text: "Buka layer tutupan lahan, lereng, elevasi, atau jarak sungai untuk membaca skor 1–5 dari QGIS di balik setiap kelas.",
     },
     {
       number: "03",

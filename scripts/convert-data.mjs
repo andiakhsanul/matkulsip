@@ -16,6 +16,9 @@ const LEGACY_DATA = path.join(
 const OUT_DATA = path.join(ROOT, "public", "data");
 const OUT_FACTORS = path.join(OUT_DATA, "factors");
 const OUT_SRC = path.join(ROOT, "src", "data");
+const SCORE_FILE = path.join(ROOT, "scripts", "parameter-scores.json");
+
+const SCORE_DATA = JSON.parse(fs.readFileSync(SCORE_FILE, "utf8"));
 
 const PRIORITY_ORDER = ["Rendah", "Sedang", "Tinggi", "Sangat Tinggi"];
 const PRIORITY_COLORS = {
@@ -66,6 +69,14 @@ function slug(value) {
 function round(value, digits = 2) {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
+}
+
+function classScore(layer, label) {
+  const score = SCORE_DATA.layers[layer]?.scores?.[String(label)];
+  if (typeof score !== "number") {
+    throw new Error(`Skor untuk ${layer} / ${label} tidak ditemukan di parameter-scores.json`);
+  }
+  return score;
 }
 
 function geometryHash(geometry) {
@@ -180,6 +191,7 @@ function buildSimpleLayer(key, file, classField, outputName, propertyName) {
         kecamatan,
         ...extra,
         [propertyName]: value,
+        score: classScore(key, value),
       }
     );
   });
@@ -201,6 +213,9 @@ function buildLandcover() {
   for (const group of groups.values()) {
     const visible = group[group.length - 1];
     const classes = [...new Set(group.map((item) => item.properties.Landuse_fi))];
+    const classScores = Object.fromEntries(
+      classes.map((label) => [label, classScore("landcover", label)])
+    );
     const kecamatan = visible.properties.WADMKC;
     const next = cleanFeature(
       visible,
@@ -210,8 +225,10 @@ function buildLandcover() {
         kecamatan,
         landcover: visible.properties.Landuse_fi,
         classes,
+        ...(group.length > 1 ? { classScores } : {}),
         duplicate: group.length > 1,
         areaHa: round(Number(visible.properties.Luas), 2),
+        score: classScore("landcover", visible.properties.Landuse_fi),
       }
     );
     features.push(next);
@@ -312,14 +329,18 @@ function summarizePriority(priority, admin) {
   };
 }
 
-function summarizeClasses(features, property) {
+function summarizeClasses(features, property, scoreLayer) {
   const map = new Map();
   for (const feature of features) {
     const label = feature.properties[property];
     map.set(label, (map.get(label) || 0) + Number(feature.properties.areaHa || 0));
   }
   return [...map.entries()]
-    .map(([label, areaHa]) => ({ label, areaHa: round(areaHa, 2) }))
+    .map(([label, areaHa]) => ({
+      label,
+      areaHa: round(areaHa, 2),
+      score: classScore(scoreLayer, label),
+    }))
     .sort((a, b) => b.areaHa - a.areaHa);
 }
 
@@ -340,8 +361,8 @@ function main() {
     round((bounds[1] + bounds[3]) / 2, 6),
   ];
 
-  const floodClasses = summarizeClasses(flood.data.features, "hazard");
-  const landcoverClasses = summarizeClasses(landcover.data.features, "landcover");
+  const floodClasses = summarizeClasses(flood.data.features, "hazard", "flood");
+  const landcoverClasses = summarizeClasses(landcover.data.features, "landcover", "landcover");
 
   const summaryPayload = {
     generatedAt: new Date().toISOString(),
@@ -382,9 +403,9 @@ function main() {
       classes: landcoverClasses,
     },
     factors: {
-      slope: summarizeClasses(slope.data.features, "slopeClass"),
-      elevation: summarizeClasses(elevation.data.features, "elevationClass"),
-      riverDistance: summarizeClasses(river.data.features, "distanceClass"),
+      slope: summarizeClasses(slope.data.features, "slopeClass", "slope"),
+      elevation: summarizeClasses(elevation.data.features, "elevationClass", "elevation"),
+      riverDistance: summarizeClasses(river.data.features, "distanceClass", "river"),
     },
     adminCentroids: admin.features.map((feature) => ({
       kecamatan: feature.properties.kecamatan,
@@ -397,43 +418,52 @@ function main() {
     title: "Peta Prioritas Pengembangan Blue-Green Infrastructure di Kota Cirebon",
     shortTitle: "BGI Cirebon",
     description:
-      "Atlas digital prioritas pengembangan Blue-Green Infrastructure (BGI) di Kota Cirebon, dibangun dari analisis weighted overlay empat parameter.",
+      "Atlas digital prioritas pengembangan Blue-Green Infrastructure (BGI) di Kota Cirebon, dilengkapi skor parameter dari shapefile QGIS.",
     weights: [
       {
         key: "landcover",
         label: "Tutupan lahan",
         weight: 40,
-        description: "Jenis tutupan lahan menentukan kesesuaian lokasi untuk intervensi BGI.",
+        description:
+          "Jenis tutupan lahan menentukan kesesuaian lokasi untuk intervensi BGI. Skor QGIS 1–5.",
       },
       {
         key: "slope",
         label: "Kemiringan lereng",
         weight: 25,
-        description: "Lereng memengaruhi limpasan permukaan dan kebutuhan resapan air.",
+        description:
+          "Lereng memengaruhi limpasan permukaan. Skor 5 untuk datar, 1 untuk curam.",
       },
       {
         key: "elevation",
         label: "Elevasi",
         weight: 25,
-        description: "Ketinggian lahan memengaruhi arah dan akumulasi limpasan.",
+        description:
+          "Ketinggian lahan memengaruhi akumulasi limpasan. Skor 5 untuk 0–25 m, 1 untuk >100 m.",
       },
       {
         key: "river",
         label: "Jarak dari sungai",
         weight: 10,
-        description: "Kedekatan dengan badan air menjadi pertimbangan konektivitas hidrologi.",
+        description:
+          "Kedekatan dengan badan air mendukung konektivitas hidrologi. Skor 5 untuk 0–50 m, 1 untuk >100 m.",
       },
     ],
     sources: [
       "Data hasil analisis weighted overlay BGI Kota Cirebon (legacy qgis2web export)",
+      "Shapefile parameter QGIS Kota Cirebon: Tutupan Lahan, Kemiringan Lereng, Ketinggian Lahan, Jarak Sungai, dan Bahaya Banjir (field skor)",
       "Batas administrasi Kecamatan Kota Cirebon",
+      "Jaringan jalan RBI 25K Kota Cirebon (data JALAN_LN_25K, layer pendukung)",
       "Basemap: Esri Light/Dark Gray Canvas dan Esri World Imagery",
     ],
     notes: [
       "Peta ini merupakan hasil analisis akademik dan bukan keputusan perencanaan final.",
-      "Layer tutupan lahan pada ekspor asli memiliki 24 pasang geometri duplikat dengan dua kelas berbeda; kelas utama mengikuti fitur teratas pada ekspor asli.",
+      "Skor 1–5 pada legenda dan detail fitur berasal dari field skor pada shapefile QGIS dan tidak diubah nilainya.",
+      "Skor parameter yang lebih tinggi berarti lebih mendukung BGI; skor ini bukan skor akhir prioritas yang dihitung melalui weighted overlay.",
+      "Layer tutupan lahan memiliki 24 pasang geometri duplikat dengan dua kelas berbeda; kelas utama mengikuti fitur teratas pada ekspor asli.",
       "Kelas prioritas tinggi dan sangat tinggi mencakup sekitar 70% area yang dianalisis; interpretasi perlu mempertimbangkan kelas breaks pada analisis asli.",
       "Bobot dan metode mengikuti abstract aplikasi asli: tutupan lahan 40%, kemiringan 25%, elevasi 25%, jarak sungai 10%.",
+      "Simbol jalan mengikuti SNI 6502.2:2010; warna tematik peta memakai palet SNI, sedangkan tema antarmuka tetap biru.",
     ],
     dataQuality: {
       landcoverDuplicates: landcover.duplicateGroups,
@@ -442,8 +472,8 @@ function main() {
       landcoverSourceAreaHa: landcover.sourceAreaHa,
       landcoverUniqueAreaHa: landcover.uniqueAreaHa,
     },
-    version: "1.0.0",
-    legacy: "qgis2web / Leaflet export",
+    version: "1.2.0",
+    legacy: "qgis2web / Leaflet export + atribut skor shapefile QGIS",
   };
 
   console.log("Writing GeoJSON and summary…");

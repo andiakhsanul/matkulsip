@@ -129,8 +129,9 @@ Breakpoint mengikuti Tailwind (`sm`, `md`, `lg`), dengan pengecekan `matchMedia`
 
 - Tiga tab: Layer, Filter, Statistik.
 - Hero prioritas memperlihatkan luas dan persentase prioritas tinggi; kartu ini juga menjadi toggle layer utama.
-- Baris layer memakai ikon, bobot, deskripsi singkat, dan switch.
-- Legenda selalu tampil untuk layer aktif; legenda jalan memakai swatch garis (termasuk pola putus-putus untuk setapak), bukan kotak area.
+- Baris layer memakai ikon, bobot, rentang skor QGIS, deskripsi singkat, dan switch.
+- Legenda selalu tampil untuk layer aktif. Layer ber-skor menampilkan chip `skor 1–5` per kelas dalam satu kolom agar label tetap terbaca; legenda jalan memakai swatch garis (termasuk pola putus-putus untuk setapak), bukan kotak area.
+- Skor berasal dari atribut `skor` shapefile QGIS, bukan nilai yang diturunkan ulang di antarmuka. Untuk empat parameter, skor tinggi berarti lebih mendukung BGI; untuk bahaya banjir, skor tinggi berarti bahaya lebih besar.
 - Slider opasitas hanya muncul saat relevan.
 - Data quality note ditempatkan dekat layer yang bermasalah, bukan disembunyikan di halaman lain.
 
@@ -143,7 +144,8 @@ Breakpoint mengikuti Tailwind (`sm`, `md`, `lg`), dengan pengecekan `matchMedia`
 
 ### Detail fitur
 
-- Menampilkan kelas, luas, kecamatan, parameter, dan catatan duplikasi.
+- Menampilkan kelas, luas, kecamatan, skor parameter/bahaya, dan catatan duplikasi.
+- Skor ditampilkan sebagai angka besar `n/5` dengan label sumber atribut QGIS.
 - Memiliki aksi untuk memusatkan peta ke fitur.
 - Di mobile muncul sebagai tab Detail di bottom sheet.
 
@@ -161,7 +163,7 @@ Breakpoint mengikuti Tailwind (`sm`, `md`, `lg`), dengan pengecekan `matchMedia`
 - Layer prioritas menggunakan fill + garis putih tipis; hover memakai garis amber; seleksi memakai casing putih dan garis grafit, bukan biru.
 - Layer jalan adalah layer pendukung independen: tetap tampil saat layer tematik diganti, karena tidak mengikuti aturan satu-layer-tematik. Simbol mengikuti SNI 6502.2:2010 dengan urutan gambar casing → garis. Arteri/kolektor terlihat sejak zoom luas; lokal dan setapak muncul saat peta diperbesar agar tidak memenuhi kanvas.
 - Wilayah kecamatan diberi marker label HTML dengan offset khusus untuk pusat kecamatan yang berdekatan. Label memakai tinta cokelat-grafit netral agar tidak bersaing dengan warna kelas tematik.
-- Tooltip mengikuti kursor dan dibatasi agar tidak keluar viewport.
+- Tooltip mengikuti kursor dan dibatasi agar tidak keluar viewport; kelas, skor QGIS, dan luas ditampilkan ringkas.
 - Peta dibatasi pada bounding box Kota Cirebon; rotasi dinonaktifkan agar orientasi konsisten.
 
 ## 8. Gerak
