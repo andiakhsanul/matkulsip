@@ -1,4 +1,9 @@
-import type { FactorLayerId, LayerId, PriorityLabel } from "@/types";
+import type {
+  FactorLayerId,
+  LayerId,
+  PriorityLabel,
+  RoadClass,
+} from "@/types";
 
 export const PRIORITY_ORDER: PriorityLabel[] = [
   "Rendah",
@@ -7,54 +12,93 @@ export const PRIORITY_ORDER: PriorityLabel[] = [
   "Sangat Tinggi",
 ];
 
+// Palet tematik mengikuti konvensi kelas peta SNI/RBI: hijau–kuning–oranye–merah
+// untuk tingkat prioritas/bahaya, serta warna tanah untuk elevasi dan lereng.
+// Biru hanya dipakai untuk unsur air pada tutupan lahan, bukan sebagai warna kelas.
 export const PRIORITY_COLORS: Record<PriorityLabel, string> = {
-  Rendah: "#d9eff8",
-  Sedang: "#8fd3e8",
-  Tinggi: "#2e9cc0",
-  "Sangat Tinggi": "#0b5e7a",
+  Rendah: "#a5d6a7",
+  Sedang: "#ffe082",
+  Tinggi: "#f4a261",
+  "Sangat Tinggi": "#c62828",
 };
 
 export const PRIORITY_TEXT_COLORS: Record<PriorityLabel, string> = {
-  Rendah: "#0a4f94",
-  Sedang: "#0a4f94",
-  Tinggi: "#f5fafe",
-  "Sangat Tinggi": "#f5fafe",
+  Rendah: "#1b3a24",
+  Sedang: "#4a3200",
+  Tinggi: "#4a1f00",
+  "Sangat Tinggi": "#fff8f5",
 };
 
 export const FLOOD_COLORS: Record<string, string> = {
-  Rendah: "#fde7c3",
-  Sedang: "#f5b971",
-  Tinggi: "#e4572e",
+  Rendah: "#fff1a8",
+  Sedang: "#f59e42",
+  Tinggi: "#b71c1c",
 };
 
 export const LANDCOVER_COLORS: Record<string, string> = {
-  Empang: "#7cc7d9",
-  "Lahan Kosong": "#e8d8b7",
-  "Perkebunan/kebun": "#79a98b",
-  Permukiman: "#d99a9a",
-  "Sawah Irigasi": "#a7d3b3",
-  "Sawah Tadah Hujan": "#e7dfb1",
-  "Semak Belukar": "#9cbf8d",
-  Sungai: "#5f9fc9",
-  Tegalan: "#c4a982",
+  Empang: "#79bfd1",
+  "Lahan Kosong": "#e7dcc1",
+  "Perkebunan/kebun": "#79a862",
+  Permukiman: "#d9958c",
+  "Sawah Irigasi": "#b3d98a",
+  "Sawah Tadah Hujan": "#ded590",
+  "Semak Belukar": "#9fbe72",
+  Sungai: "#4f97bf",
+  Tegalan: "#c5a269",
 };
 
 export const SLOPE_COLORS: Record<string, string> = {
-  "0-8%": "#d9eff8",
-  "8-15%": "#68b9d6",
-  ">15%": "#0b5e7a",
+  "0-8%": "#f6e7b8",
+  "8-15%": "#dda15e",
+  ">15%": "#9c5a2e",
 };
 
 export const ELEVATION_COLORS: Record<string, string> = {
-  "0-25": "#e6f2f7",
-  "25-100": "#79b6d9",
-  ">100": "#0a4c72",
+  "0-25": "#f3e6c4",
+  "25-100": "#d4b071",
+  ">100": "#8f6238",
 };
 
 export const RIVER_COLORS: Record<string, string> = {
-  "0-50 m": "#e8f7f8",
-  "50-100 m": "#58c7d1",
-  ">100 m": "#0a6b73",
+  "0-50 m": "#2f7d32",
+  "50-100 m": "#8fbf6a",
+  ">100 m": "#e7e0c8",
+};
+
+// Simbol jalan mengikuti SNI 6502.2:2010: arteri/kolektor memakai magenta
+// dengan casing hitam, jalan lokal memakai garis hitam dengan casing putih,
+// sedangkan jalan lain/setapak memakai magenta muda. Warna magenta sedikit
+// digelapkan agar tetap terbaca di atas basemap terang maupun citra satelit.
+export const ROAD_CLASS_ORDER: RoadClass[] = [
+  "Jalan Arteri",
+  "Jalan Kolektor",
+  "Jalan Lokal",
+  "Jalan Lain",
+  "Jalan Setapak",
+];
+
+export const ROAD_COLORS: Record<RoadClass, string> = {
+  "Jalan Arteri": "#e6007e",
+  "Jalan Kolektor": "#e6007e",
+  "Jalan Lokal": "#26221f",
+  "Jalan Lain": "#ef8ac5",
+  "Jalan Setapak": "#dca0bb",
+};
+
+export const ROAD_CASING_COLORS: Record<RoadClass, string> = {
+  "Jalan Arteri": "#2b2428",
+  "Jalan Kolektor": "#2b2428",
+  "Jalan Lokal": "#fffdf8",
+  "Jalan Lain": "rgba(43,36,40,.55)",
+  "Jalan Setapak": "rgba(43,36,40,.55)",
+};
+
+export const ROAD_LABELS: Record<RoadClass, string> = {
+  "Jalan Arteri": "Arteri",
+  "Jalan Kolektor": "Kolektor",
+  "Jalan Lokal": "Lokal",
+  "Jalan Lain": "Jalan lain",
+  "Jalan Setapak": "Setapak",
 };
 
 export const FACTOR_COLORS: Record<FactorLayerId, Record<string, string>> = {
@@ -82,7 +126,7 @@ export const LAYER_META: Record<
       "Hasil weighted overlay empat parameter, dikelompokkan menjadi empat kelas prioritas.",
     group: "priority",
     property: "priority",
-    color: "#2e9cc0",
+    color: "#c62828",
   },
   landcover: {
     label: "Tutupan lahan",
@@ -91,7 +135,7 @@ export const LAYER_META: Record<
       "Jenis tutupan lahan di Kota Cirebon. Bobot 40% dalam analisis asli.",
     group: "factor",
     property: "landcover",
-    color: "#79a98b",
+    color: "#79a862",
   },
   slope: {
     label: "Kemiringan lereng",
@@ -100,7 +144,7 @@ export const LAYER_META: Record<
       "Kelas kemiringan lereng 0–8%, 8–15%, dan >15%. Bobot 25%.",
     group: "factor",
     property: "slopeClass",
-    color: "#68b9d6",
+    color: "#dda15e",
   },
   elevation: {
     label: "Ketinggian lahan",
@@ -109,7 +153,7 @@ export const LAYER_META: Record<
       "Kelas elevasi 0–25 m, 25–100 m, dan >100 m. Bobot 25%.",
     group: "factor",
     property: "elevationClass",
-    color: "#79b6d9",
+    color: "#d4b071",
   },
   river: {
     label: "Jarak dari sungai",
@@ -118,7 +162,7 @@ export const LAYER_META: Record<
       "Kelas jarak 0–50 m, 50–100 m, dan >100 m dari badan air. Bobot 10%.",
     group: "factor",
     property: "distanceClass",
-    color: "#58c7d1",
+    color: "#2f7d32",
   },
   flood: {
     label: "Bahaya banjir",
@@ -127,7 +171,16 @@ export const LAYER_META: Record<
       "Layer konteks tingkat bahaya banjir. Tidak termasuk dalam empat parameter weighted overlay.",
     group: "context",
     property: "hazard",
-    color: "#f5b971",
+    color: "#f59e42",
+  },
+  roads: {
+    label: "Jaringan jalan",
+    shortLabel: "Jalan",
+    description:
+      "Layer pendukung akses RBI 25K. Arteri/kolektor magenta, lokal hitam-putih, dan setapak magenta muda sesuai SNI 6502.2:2010; jalan rinci muncul saat diperbesar.",
+    group: "context",
+    property: "roadClass",
+    color: "#c2185b",
   },
   admin: {
     label: "Batas kecamatan",
@@ -135,7 +188,7 @@ export const LAYER_META: Record<
     description: "Batas dan label lima kecamatan di Kota Cirebon.",
     group: "context",
     property: "kecamatan",
-    color: "#0a4c72",
+    color: "#6b4a3a",
   },
 };
 
@@ -155,6 +208,7 @@ export const THEMATIC_LAYERS: LayerId[] = [
 export const LAYER_FILE: Record<Exclude<LayerId, "admin">, string> = {
   priority: "data/priority.geojson",
   flood: "data/flood.geojson",
+  roads: "data/roads.geojson",
   landcover: "data/factors/landcover.geojson",
   slope: "data/factors/slope.geojson",
   elevation: "data/factors/elevation.geojson",

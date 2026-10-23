@@ -4,6 +4,7 @@ import {
   Mountains,
   Path,
   Plant,
+  RoadHorizon,
   Ruler,
   Stack,
   Waves,
@@ -13,6 +14,7 @@ import type { LayerId } from "@/types";
 const ICONS: Record<LayerId, Icon> = {
   priority: Stack,
   flood: Waves,
+  roads: RoadHorizon,
   landcover: Plant,
   slope: Mountains,
   elevation: Ruler,

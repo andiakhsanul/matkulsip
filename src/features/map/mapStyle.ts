@@ -21,14 +21,14 @@ export const MAP_STYLE: StyleSpecification = {
       id: "background",
       type: "background",
       paint: {
-        "background-color": "#dcecf5",
+        "background-color": "#f1efe8",
       },
     },
   ],
 };
 
 export const BASEMAP_BACKGROUND: Record<string, string> = {
-  light: "#f0f3f4",
+  light: "#efede6",
   satellite: "#1d2b26",
   dark: "#080d11",
 };
@@ -47,24 +47,28 @@ function matchColor(
 export const PRIORITY_FILL_COLOR = matchColor(
   "priority",
   PRIORITY_COLORS as ColorMap,
-  "#8fd3e8"
+  "#d7d2c4"
 );
 
-export const FLOOD_FILL_COLOR = matchColor("hazard", FLOOD_COLORS, "#f5b971");
+export const FLOOD_FILL_COLOR = matchColor("hazard", FLOOD_COLORS, "#f59e42");
 
 export const LANDCOVER_FILL_COLOR = matchColor(
   "landcover",
   LANDCOVER_COLORS,
-  "#bfdeef"
+  "#ded6c3"
 );
 
-export const SLOPE_FILL_COLOR = matchColor("slopeClass", SLOPE_COLORS, "#bfdeef");
+export const SLOPE_FILL_COLOR = matchColor("slopeClass", SLOPE_COLORS, "#e6e0d0");
 export const ELEVATION_FILL_COLOR = matchColor(
   "elevationClass",
   ELEVATION_COLORS,
-  "#bfdeef"
+  "#e6e0d0"
 );
-export const RIVER_FILL_COLOR = matchColor("distanceClass", RIVER_COLORS, "#bfdeef");
+export const RIVER_FILL_COLOR = matchColor(
+  "distanceClass",
+  RIVER_COLORS,
+  "#e6e0d0"
+);
 
 export function factorFillColor(layer: FactorLayerId) {
   if (layer === "landcover") return LANDCOVER_FILL_COLOR;

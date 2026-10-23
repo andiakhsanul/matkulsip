@@ -11,6 +11,7 @@ import type {
   Metadata,
   PriorityCollection,
   RiverCollection,
+  RoadCollection,
   SlopeCollection,
   SummaryData,
 } from "@/types";
@@ -18,6 +19,7 @@ import type {
 interface LayerDataMap {
   priority: PriorityCollection | null;
   flood: FloodCollection | null;
+  roads: RoadCollection | null;
   admin: AdminCollection | null;
   landcover: LandcoverCollection | null;
   slope: SlopeCollection | null;
@@ -40,6 +42,7 @@ interface DataContextValue {
 const initialLoading: Record<LayerId, boolean> = {
   priority: false,
   flood: false,
+  roads: false,
   admin: false,
   landcover: false,
   slope: false,
@@ -52,6 +55,7 @@ const DataContext = React.createContext<DataContextValue | null>(null);
 const PATHS: Record<LayerId, string> = {
   priority: "data/priority.geojson",
   flood: "data/flood.geojson",
+  roads: "data/roads.geojson",
   admin: "data/admin.geojson",
   landcover: "data/factors/landcover.geojson",
   slope: "data/factors/slope.geojson",
@@ -75,6 +79,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = React.useState<LayerDataMap>({
     priority: null,
     flood: null,
+    roads: null,
     admin: null,
     landcover: null,
     slope: null,
@@ -120,12 +125,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     void loadLayer("priority");
     void loadLayer("admin");
+    void loadLayer("roads");
   }, [loadLayer]);
 
   const retryInitial = React.useCallback(() => {
     setInitialError(null);
     void loadLayer("priority");
     void loadLayer("admin");
+    void loadLayer("roads");
   }, [loadLayer]);
 
   const isInitialLoading =

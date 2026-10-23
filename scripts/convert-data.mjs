@@ -19,10 +19,10 @@ const OUT_SRC = path.join(ROOT, "src", "data");
 
 const PRIORITY_ORDER = ["Rendah", "Sedang", "Tinggi", "Sangat Tinggi"];
 const PRIORITY_COLORS = {
-  Rendah: "#d9eff8",
-  Sedang: "#8fd3e8",
-  Tinggi: "#2e9cc0",
-  "Sangat Tinggi": "#0b5e7a",
+  Rendah: "#a5d6a7",
+  Sedang: "#ffe082",
+  Tinggi: "#f4a261",
+  "Sangat Tinggi": "#c62828",
 };
 
 const FILES = {

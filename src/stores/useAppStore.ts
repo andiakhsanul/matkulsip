@@ -47,6 +47,7 @@ interface AppState {
 const DEFAULT_LAYERS: Record<LayerId, boolean> = {
   priority: true,
   flood: false,
+  roads: true,
   admin: true,
   landcover: false,
   slope: false,
@@ -57,6 +58,7 @@ const DEFAULT_LAYERS: Record<LayerId, boolean> = {
 const DEFAULT_OPACITY: Record<LayerId, number> = {
   priority: 0.92,
   flood: 0.68,
+  roads: 0.95,
   admin: 1,
   landcover: 0.72,
   slope: 0.72,
@@ -86,8 +88,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     const state = get();
     const nextLayers = { ...state.layers };
 
-    if (id === "admin") {
-      nextLayers.admin = enabled;
+    if (id === "admin" || id === "roads") {
+      nextLayers[id] = enabled;
       set({ layers: nextLayers });
       return;
     }

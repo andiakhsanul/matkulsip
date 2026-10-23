@@ -43,6 +43,7 @@ export function LegendList({
 }) {
   const items = legendForLayer(layer, summary);
   if (!items.length) return null;
+  const hasArea = items.some((item) => typeof item.areaHa === "number");
 
   return (
     <div
@@ -56,10 +57,34 @@ export function LegendList({
           key={item.label}
           className="flex min-w-0 items-center gap-2 text-[10.5px] text-ink-soft"
         >
-          <span
-            className="h-2.5 w-2.5 shrink-0 rounded-[4px] ring-1 ring-inset ring-black/10"
-            style={{ backgroundColor: item.color }}
-          />
+          {item.kind === "line" || item.kind === "line-dashed" ? (
+            <span className="relative flex h-3 w-6 shrink-0 items-center">
+              <span
+                className="absolute inset-x-0 rounded-full"
+                style={{
+                  backgroundColor: item.casingColor,
+                  height: (item.lineWidth ?? 1.4) + 2.2,
+                }}
+              />
+              <span
+                className="absolute inset-x-0 rounded-full"
+                style={{
+                  height: item.lineWidth ?? 1.4,
+                  backgroundColor:
+                    item.kind === "line-dashed" ? "transparent" : item.color,
+                  backgroundImage:
+                    item.kind === "line-dashed"
+                      ? `repeating-linear-gradient(90deg, ${item.color} 0 4px, transparent 4px 6.5px)`
+                      : undefined,
+                }}
+              />
+            </span>
+          ) : (
+            <span
+              className="h-2.5 w-2.5 shrink-0 rounded-[4px] ring-1 ring-inset ring-black/10"
+              style={{ backgroundColor: item.color }}
+            />
+          )}
           <span className="min-w-0 flex-1 truncate font-medium text-ink">
             {item.displayLabel}
           </span>
@@ -70,10 +95,18 @@ export function LegendList({
           )}
         </div>
       ))}
-      <div className="col-span-2 mt-0.5 flex items-center gap-1.5 text-[9px] text-ink-faint">
-        <Info size={10} />
-        Angka menunjukkan luas dalam hektare.
-      </div>
+      {hasArea && (
+        <div className="col-span-2 mt-0.5 flex items-center gap-1.5 text-[9px] text-ink-faint">
+          <Info size={10} />
+          Angka menunjukkan luas dalam hektare.
+        </div>
+      )}
+      {layer === "roads" && (
+        <div className="col-span-2 mt-0.5 flex items-center gap-1.5 text-[9px] text-ink-faint">
+          <Info size={10} />
+          Simbol jalan mengikuti SNI 6502.2:2010.
+        </div>
+      )}
     </div>
   );
 }

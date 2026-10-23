@@ -11,6 +11,7 @@ import {
   Mountains,
   Path,
   Plant,
+  RoadHorizon,
   Ruler,
   Sparkle,
   Stack,
@@ -333,7 +334,7 @@ function Limitations() {
     },
     {
       title: "Skala dan sumber",
-      text: "Peta menggunakan basemap Esri dan geometri yang disederhanakan. Gunakan untuk eksplorasi dan diskusi, bukan pengukuran presisi.",
+      text: "Peta menggunakan basemap Esri, geometri yang disederhanakan, dan layer jalan RBI 25K. Gunakan untuk eksplorasi dan diskusi, bukan pengukuran presisi.",
     },
   ];
 
@@ -498,6 +499,19 @@ export function MethodologyPage() {
                 <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
                 React, MapLibre GL, dan Vite untuk antarmuka atlas
               </div>
+            </div>
+            <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-[#c2185b]/15 bg-[#c2185b]/[0.035] px-3 py-2.5">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#c2185b]/10 text-[#a3134e]">
+                <RoadHorizon size={14} weight="fill" />
+              </span>
+              <p className="text-[9.5px] leading-relaxed text-ink-soft">
+                <span className="font-semibold text-ink">Simbol peta.</span>{" "}
+                Warna tematik mengikuti konvensi SNI/RBI: hijau–kuning–oranye–merah
+                untuk prioritas, warna tanah untuk lereng/elevasi, dan biru hanya
+                untuk unsur air. Arteri/kolektor memakai magenta, lokal hitam-putih,
+                serta setapak magenta muda sesuai SNI 6502.2:2010. Tema antarmuka
+                web tetap biru.
+              </p>
             </div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-mist-100 pt-3">
               <p className="max-w-[520px] text-[8.5px] leading-relaxed text-ink-faint">

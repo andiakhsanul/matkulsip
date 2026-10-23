@@ -1,10 +1,24 @@
-import type { Feature, FeatureCollection, MultiPolygon } from "geojson";
+import type {
+  Feature,
+  FeatureCollection,
+  LineString,
+  MultiLineString,
+  MultiPolygon,
+} from "geojson";
 
 export type PriorityLabel = "Rendah" | "Sedang" | "Tinggi" | "Sangat Tinggi";
+
+export type RoadClass =
+  | "Jalan Arteri"
+  | "Jalan Kolektor"
+  | "Jalan Lokal"
+  | "Jalan Lain"
+  | "Jalan Setapak";
 
 export type LayerId =
   | "priority"
   | "flood"
+  | "roads"
   | "admin"
   | "landcover"
   | "slope"
@@ -30,6 +44,12 @@ export interface FloodProperties {
   kecamatan: string;
   hazard: "Rendah" | "Sedang" | "Tinggi";
   areaHa: number;
+}
+
+export interface RoadProperties {
+  id: string;
+  roadClass: RoadClass;
+  lengthM: number;
 }
 
 export interface AdminProperties {
@@ -69,6 +89,7 @@ export interface RiverProperties {
 
 export type PriorityFeature = Feature<MultiPolygon, PriorityProperties>;
 export type FloodFeature = Feature<MultiPolygon, FloodProperties>;
+export type RoadFeature = Feature<LineString | MultiLineString, RoadProperties>;
 export type AdminFeature = Feature<MultiPolygon, AdminProperties>;
 export type LandcoverFeature = Feature<MultiPolygon, LandcoverProperties>;
 export type SlopeFeature = Feature<MultiPolygon, SlopeProperties>;
@@ -77,6 +98,10 @@ export type RiverFeature = Feature<MultiPolygon, RiverProperties>;
 
 export type PriorityCollection = FeatureCollection<MultiPolygon, PriorityProperties>;
 export type FloodCollection = FeatureCollection<MultiPolygon, FloodProperties>;
+export type RoadCollection = FeatureCollection<
+  LineString | MultiLineString,
+  RoadProperties
+>;
 export type AdminCollection = FeatureCollection<MultiPolygon, AdminProperties>;
 export type LandcoverCollection = FeatureCollection<MultiPolygon, LandcoverProperties>;
 export type SlopeCollection = FeatureCollection<MultiPolygon, SlopeProperties>;
@@ -86,6 +111,7 @@ export type RiverCollection = FeatureCollection<MultiPolygon, RiverProperties>;
 export type AnyLayerCollection =
   | PriorityCollection
   | FloodCollection
+  | RoadCollection
   | AdminCollection
   | LandcoverCollection
   | SlopeCollection

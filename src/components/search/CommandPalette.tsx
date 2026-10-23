@@ -16,6 +16,7 @@ import {
   Mountains,
   Path,
   Plant,
+  RoadHorizon,
   Ruler,
   ShareNetwork,
   SlidersHorizontal,
@@ -36,6 +37,7 @@ import type { LayerId } from "@/types";
 const layerIcons: Record<LayerId, React.ReactNode> = {
   priority: <Stack size={16} weight="fill" />,
   flood: <Waves size={16} weight="fill" />,
+  roads: <RoadHorizon size={16} weight="fill" />,
   landcover: <Plant size={16} weight="fill" />,
   slope: <Mountains size={16} weight="fill" />,
   elevation: <Ruler size={16} weight="fill" />,
@@ -152,7 +154,7 @@ export function CommandPalette() {
                 ))}
               </Command.Group>
 
-              <Command.Group heading="Layer tematik">
+              <Command.Group heading="Layer peta">
                 {(Object.keys(LAYER_META) as LayerId[]).map((id) => (
                   <Command.Item
                     key={id}

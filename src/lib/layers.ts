@@ -6,6 +6,10 @@ import {
   LAYER_META,
   PRIORITY_COLORS,
   RIVER_COLORS,
+  ROAD_CASING_COLORS,
+  ROAD_CLASS_ORDER,
+  ROAD_COLORS,
+  ROAD_LABELS,
   SLOPE_COLORS,
 } from "@/lib/constants";
 import { formatArea } from "@/lib/format";
@@ -14,6 +18,7 @@ import type {
   LayerId,
   PriorityFeature,
   PriorityLabel,
+  RoadClass,
   SummaryData,
 } from "@/types";
 
@@ -22,6 +27,9 @@ export interface LegendItem {
   displayLabel: string;
   color: string;
   areaHa?: number;
+  kind?: "fill" | "line" | "line-dashed";
+  casingColor?: string;
+  lineWidth?: number;
 }
 
 export function getActiveLayer(layers: Record<LayerId, boolean>): LayerId | null {
@@ -59,15 +67,30 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.flood.classes.map((item) => ({
       label: item.label,
       displayLabel: item.label,
-      color: FLOOD_COLORS[item.label] ?? "#d7eaf7",
+      color: FLOOD_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
+    }));
+  }
+  if (layer === "roads") {
+    return ROAD_CLASS_ORDER.map((roadClass) => ({
+      label: roadClass,
+      displayLabel: ROAD_LABELS[roadClass],
+      color: ROAD_COLORS[roadClass],
+      kind: roadClass === "Jalan Setapak" ? "line-dashed" : "line",
+      casingColor: ROAD_CASING_COLORS[roadClass],
+      lineWidth:
+        roadClass === "Jalan Arteri"
+          ? 2.4
+          : roadClass === "Jalan Kolektor"
+            ? 1.9
+            : 1.4,
     }));
   }
   if (layer === "landcover") {
     return summary.landcover.classes.map((item) => ({
       label: item.label,
       displayLabel: item.label,
-      color: LANDCOVER_COLORS[item.label] ?? "#bfdeef",
+      color: LANDCOVER_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
     }));
   }
@@ -75,7 +98,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.factors.slope.map((item) => ({
       label: item.label,
       displayLabel: displayClassLabel("slope", item.label),
-      color: SLOPE_COLORS[item.label] ?? "#bfdeef",
+      color: SLOPE_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
     }));
   }
@@ -83,7 +106,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.factors.elevation.map((item) => ({
       label: item.label,
       displayLabel: displayClassLabel("elevation", item.label),
-      color: ELEVATION_COLORS[item.label] ?? "#bfdeef",
+      color: ELEVATION_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
     }));
   }
@@ -91,7 +114,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.factors.riverDistance.map((item) => ({
       label: item.label,
       displayLabel: displayClassLabel("river", item.label),
-      color: RIVER_COLORS[item.label] ?? "#bfdeef",
+      color: RIVER_COLORS[item.label] ?? "#e6e0d0",
       areaHa: item.areaHa,
     }));
   }
@@ -147,17 +170,19 @@ export function layerSummaryValue(layer: LayerId, summary: SummaryData) {
   if (layer === "slope" || layer === "elevation" || layer === "river") {
     return `${legendForLayer(layer, summary).length} kelas`;
   }
+  if (layer === "roads") return "SNI 6502.2";
   return "";
 }
 
 export function legendColor(layer: LayerId, value: string) {
-  if (layer === "priority") return PRIORITY_COLORS[value as PriorityLabel] ?? "#bfdeef";
-  if (layer === "flood") return FLOOD_COLORS[value] ?? "#bfdeef";
-  if (layer === "landcover") return LANDCOVER_COLORS[value] ?? "#bfdeef";
-  if (layer === "slope") return SLOPE_COLORS[value] ?? "#bfdeef";
-  if (layer === "elevation") return ELEVATION_COLORS[value] ?? "#bfdeef";
-  if (layer === "river") return RIVER_COLORS[value] ?? "#bfdeef";
-  return "#bfdeef";
+  if (layer === "priority") return PRIORITY_COLORS[value as PriorityLabel] ?? "#e6e0d0";
+  if (layer === "flood") return FLOOD_COLORS[value] ?? "#e6e0d0";
+  if (layer === "landcover") return LANDCOVER_COLORS[value] ?? "#e6e0d0";
+  if (layer === "slope") return SLOPE_COLORS[value] ?? "#e6e0d0";
+  if (layer === "elevation") return ELEVATION_COLORS[value] ?? "#e6e0d0";
+  if (layer === "river") return RIVER_COLORS[value] ?? "#e6e0d0";
+  if (layer === "roads") return ROAD_COLORS[value as RoadClass] ?? "#c2185b";
+  return "#e6e0d0";
 }
 
 export function factorColorMap(layer: FactorLayerId) {

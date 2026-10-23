@@ -226,6 +226,16 @@ function LayerRow({ id, summary }: { id: LayerId; summary: ReturnType<typeof use
                 bobot {weight}%
               </span>
             )}
+            {id === "roads" && (
+              <span className="rounded-md bg-[#c2185b]/10 px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.06em] text-[#a3134e]">
+                SNI 25K
+              </span>
+            )}
+            {id === "roads" && data.roads && (
+              <span className="font-mono text-[8px] text-ink-faint">
+                {data.roads.features.length} segmen
+              </span>
+            )}
             {isLoading && (
               <span className="h-2.5 w-2.5 animate-spin rounded-full border border-blue-600/20 border-t-blue-600" />
             )}
@@ -341,6 +351,7 @@ export function LayersTab() {
       <section>
         <SectionLabel meta="Konteks">Layer pendukung</SectionLabel>
         <div className="space-y-1.5">
+          <LayerRow id="roads" summary={summary} />
           <LayerRow id="flood" summary={summary} />
           <LayerRow id="admin" summary={summary} />
         </div>
@@ -363,8 +374,9 @@ export function LayersTab() {
       <div className="flex items-start gap-2 rounded-xl bg-mist-50 px-2.5 py-2 text-[9px] leading-relaxed text-ink-soft">
         <Info size={12} className="mt-0.5 shrink-0 text-blue-600" />
         <span>
-          Hanya satu layer tematik ditampilkan pada satu waktu agar data tidak
-          saling menutupi.{" "}
+          Warna peta mengikuti konvensi SNI (arteri/kolektor magenta, lokal
+          hitam-putih), sedangkan tema antarmuka tetap biru. Hanya satu layer
+          tematik ditampilkan pada satu waktu.{" "}
           <Link
             to="/metodologi"
             className="font-semibold text-blue-700 underline decoration-blue-700/20 underline-offset-2"

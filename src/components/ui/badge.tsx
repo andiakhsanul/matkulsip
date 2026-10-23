@@ -57,7 +57,7 @@ export function PriorityBadge({
           backgroundColor:
             label === "Tinggi" || label === "Sangat Tinggi"
               ? "rgba(255,255,255,.9)"
-              : "#0b63b8",
+              : PRIORITY_TEXT_COLORS[label],
         }}
       />
       {label}

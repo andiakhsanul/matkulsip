@@ -7,7 +7,8 @@ Dokumen ini mencatat arah visual, token, dan keputusan antarmuka atlas. Tujuanny
 **Konsep: atlas sebagai instrumen peta.**
 
 - Peta mengisi seluruh kanvas; UI mengambang di atasnya seperti panel instrumen.
-- Palet didominasi biru laut dalam, aqua, dan kabut terang, dengan aksen amber yang sangat terbatas untuk peringatan/duplikasi.
+- Antarmuka didominasi biru laut dalam, aqua, dan kabut terang, dengan aksen amber yang sangat terbatas untuk peringatan/duplikasi.
+- Warna **di dalam peta** dipisahkan dari tema UI: kelas tematik memakai palet SNI/RBI (hijau–kuning–oranye–merah, tanah, dan hijau), bukan biru. Biru hanya muncul untuk unsur air.
 - Permukaan dibuat berlapis: kaca, bayangan lembut, garis tipis, dan ruang kosong yang cukup.
 - Data menjadi dekorasi: angka besar, label mono, legenda warna, dan kontur tipis menjadi bahasa visual utama.
 - Tidak ada gradient dekoratif yang berlebihan, ilustrasi stok, atau kartu bertumpuk tanpa alasan.
@@ -43,7 +44,7 @@ Aturan:
 | --- | --- | --- |
 | `--color-ocean-950` | `#041e33` | Latar tergelap, header aktif, blok formula |
 | `--color-ocean-900` | `#05263c` | Teks pada permukaan terang |
-| `--color-ocean-700` | `#0a4c72` | Aksen peta, label |
+| `--color-ocean-700` | `#0a4c72` | Aksen UI dan label antarmuka |
 | `--color-blue-700` | `#0a4f94` | Tautan, aksen kuat |
 | `--color-blue-600` | `#0b63b8` | Tombol utama, status aktif |
 | `--color-blue-500` | `#1683e8` | Fokus, highlight |
@@ -58,14 +59,28 @@ Aturan:
 
 ### Warna data prioritas
 
-| Kelas | Warna |
-| --- | --- |
-| Rendah | `#d9eff8` |
-| Sedang | `#8fd3e8` |
-| Tinggi | `#2e9cc0` |
-| Sangat Tinggi | `#0b5e7a` |
+| Kelas | Warna peta | Peran |
+| --- | --- | --- |
+| Rendah | `#a5d6a7` | Hijau muda |
+| Sedang | `#ffe082` | Kuning |
+| Tinggi | `#f4a261` | Oranye |
+| Sangat Tinggi | `#c62828` | Merah |
 
-Rasio penggunaan yang dijaga: **90% biru/netral, 10% aksen hangat**. Amber tidak dipakai untuk elemen dekoratif; hanya untuk peringatan, catatan kualitas data, dan hover line.
+Urutan ini mengikuti konvensi kelas pada peta tematik SNI/RBI: hijau untuk tingkat rendah, kuning–oranye untuk tingkat menengah, merah untuk tingkat tinggi. Palet yang sama dipakai untuk bahaya banjir dan grafik statistik agar legenda konsisten.
+
+### Warna peta lainnya
+
+| Unsur | Palet |
+| --- | --- |
+| Kemiringan lereng | Kuning pasir → okrem → cokelat tanah |
+| Elevasi | Krem → tan → cokelat tua (hypsometric tint) |
+| Jarak dari sungai | Hijau tua → hijau muda → krem |
+| Tutupan lahan | Hijau sawah/kebun, cokelat tegalan, salmon permukiman, biru hanya untuk sungai/empang |
+| Jalan arteri/kolektor | Magenta `#e6007e` dengan casing hitam |
+| Jalan lokal | Hitam `#26221f` dengan casing putih |
+| Jalan lain/setapak | Magenta muda `#ef8ac5` / `#dca0bb`; setapak putus-putus |
+
+Rasio penggunaan UI yang dijaga: **90% biru/netral, 10% aksen hangat**. Amber tidak dipakai untuk elemen dekoratif; hanya untuk peringatan, catatan kualitas data, dan hover line. Rasio ini berlaku untuk antarmuka, bukan isi peta.
 
 ## 4. Permukaan, radius, dan bayangan
 
@@ -115,7 +130,7 @@ Breakpoint mengikuti Tailwind (`sm`, `md`, `lg`), dengan pengecekan `matchMedia`
 - Tiga tab: Layer, Filter, Statistik.
 - Hero prioritas memperlihatkan luas dan persentase prioritas tinggi; kartu ini juga menjadi toggle layer utama.
 - Baris layer memakai ikon, bobot, deskripsi singkat, dan switch.
-- Legenda selalu tampil untuk layer aktif.
+- Legenda selalu tampil untuk layer aktif; legenda jalan memakai swatch garis (termasuk pola putus-putus untuk setapak), bukan kotak area.
 - Slider opasitas hanya muncul saat relevan.
 - Data quality note ditempatkan dekat layer yang bermasalah, bukan disembunyikan di halaman lain.
 
@@ -143,8 +158,9 @@ Breakpoint mengikuti Tailwind (`sm`, `md`, `lg`), dengan pengecekan `matchMedia`
 - Renderer: MapLibre GL dengan geometri GeoJSON yang sudah disederhanakan.
 - Basemap: Esri Light Gray Canvas, Esri Dark Gray Canvas, dan Esri World Imagery; label referensi ditambahkan sebagai raster terpisah untuk mode terang/gelap.
 - Semua basemap dipasang sejak awal dan diubah melalui `visibility`, sehingga pergantian basemap tidak mengubah urutan layer tematik.
-- Layer prioritas menggunakan fill + garis putih tipis; hover memakai garis amber; seleksi memakai casing putih dan garis ocean.
-- Wilayah kecamatan diberi marker label HTML dengan offset khusus untuk pusat kecamatan yang berdekatan.
+- Layer prioritas menggunakan fill + garis putih tipis; hover memakai garis amber; seleksi memakai casing putih dan garis grafit, bukan biru.
+- Layer jalan adalah layer pendukung independen: tetap tampil saat layer tematik diganti, karena tidak mengikuti aturan satu-layer-tematik. Simbol mengikuti SNI 6502.2:2010 dengan urutan gambar casing → garis. Arteri/kolektor terlihat sejak zoom luas; lokal dan setapak muncul saat peta diperbesar agar tidak memenuhi kanvas.
+- Wilayah kecamatan diberi marker label HTML dengan offset khusus untuk pusat kecamatan yang berdekatan. Label memakai tinta cokelat-grafit netral agar tidak bersaing dengan warna kelas tematik.
 - Tooltip mengikuti kursor dan dibatasi agar tidak keluar viewport.
 - Peta dibatasi pada bounding box Kota Cirebon; rotasi dinonaktifkan agar orientasi konsisten.
 

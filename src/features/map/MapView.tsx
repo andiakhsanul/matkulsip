@@ -24,15 +24,22 @@ import {
   BASEMAPS,
   BASEMAP_ORDER,
 } from "@/lib/basemaps";
-import {
-  FLOOD_COLORS,
-  LAYER_META,
-  PRIORITY_COLORS,
-} from "@/lib/constants";
+import { LAYER_META } from "@/lib/constants";
 import { getActiveLayer, getLayerValue, legendColor } from "@/lib/layers";
 import { cn, formatArea, formatNumber } from "@/lib/format";
-import { BASEMAP_BACKGROUND, combineFilters, idFilter, MAP_STYLE, priorityClassFilter, kecamatanFilter } from "@/features/map/mapStyle";
+import {
+  BASEMAP_BACKGROUND,
+  combineFilters,
+  factorFillColor,
+  FLOOD_FILL_COLOR,
+  idFilter,
+  kecamatanFilter,
+  MAP_STYLE,
+  PRIORITY_FILL_COLOR,
+  priorityClassFilter,
+} from "@/features/map/mapStyle";
 import { MapControls } from "@/features/map/MapControls";
+import { RoadLayers, ROAD_LAYER_IDS } from "@/features/map/RoadLayers";
 import type {
   AdminProperties,
   ElevationProperties,
@@ -61,14 +68,11 @@ function filterProps(filter: FilterSpecification | undefined) {
   return filter ? { filter } : {};
 }
 
-const FACTOR_CONFIGS: {
-  id: FactorLayerId;
-  property: string;
-}[] = [
-  { id: "landcover", property: "landcover" },
-  { id: "slope", property: "slopeClass" },
-  { id: "elevation", property: "elevationClass" },
-  { id: "river", property: "distanceClass" },
+const FACTOR_CONFIGS: { id: FactorLayerId }[] = [
+  { id: "landcover" },
+  { id: "slope" },
+  { id: "elevation" },
+  { id: "river" },
 ];
 
 // Keep the compact kecamatan labels legible where administrative centres
@@ -206,7 +210,8 @@ function MapLoadingOverlay({
               Menyiapkan atlas BGI
             </p>
             <p className="mt-2 text-[11.5px] leading-relaxed text-ink-soft">
-              Memuat geometri prioritas dan batas kecamatan Kota Cirebon.
+              Memuat geometri prioritas, jaringan jalan, dan batas kecamatan
+              Kota Cirebon.
             </p>
             <div className="mt-5 h-1 w-40 overflow-hidden rounded-full bg-mist-200">
               <div className="h-full w-1/2 animate-[loading-slide_1.4s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-blue-600 to-aqua-400" />
@@ -318,6 +323,28 @@ export function MapView() {
     setMapReady(true);
     window.setTimeout(() => fitCity(0), 120);
   }, [fitCity]);
+
+  // A thematic source can be mounted after the road source when the user
+  // changes layers. MapLibre appends newly mounted layers on top, so keep the
+  // road stack above thematic fills until its own layout is stable.
+  React.useEffect(() => {
+    if (!mapReady || !layers.roads) return;
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+
+    const moveRoadsToTop = () => {
+      for (const id of ROAD_LAYER_IDS) {
+        if (map.getLayer(id)) map.moveLayer(id);
+      }
+    };
+
+    const frame = window.requestAnimationFrame(moveRoadsToTop);
+    const timer = window.setTimeout(moveRoadsToTop, 240);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, [data, layers, mapReady]);
 
   const clearHover = React.useCallback(() => {
     setHover(null);
@@ -474,7 +501,7 @@ export function MapView() {
               id="admin-line"
               type="line"
               paint={{
-                "line-color": "rgba(4,30,51,.48)",
+                "line-color": "rgba(43,36,32,.52)",
                 "line-width": 1.05,
                 "line-opacity": 0.9,
               }}
@@ -489,19 +516,7 @@ export function MapView() {
               type="fill"
               {...filterProps(priorityFilter)}
               paint={{
-                "fill-color": [
-                  "match",
-                  ["get", "priority"],
-                  "Rendah",
-                  PRIORITY_COLORS.Rendah,
-                  "Sedang",
-                  PRIORITY_COLORS.Sedang,
-                  "Tinggi",
-                  PRIORITY_COLORS.Tinggi,
-                  "Sangat Tinggi",
-                  PRIORITY_COLORS["Sangat Tinggi"],
-                  "#8fd3e8",
-                ],
+                "fill-color": PRIORITY_FILL_COLOR,
                 "fill-opacity": opacity.priority,
               }}
             />
@@ -540,7 +555,7 @@ export function MapView() {
               type="line"
               filter={selectedFilter}
               paint={{
-                "line-color": "#041e33",
+                "line-color": "#2f2a26",
                 "line-width": 2.2,
                 "line-opacity": 1,
               }}
@@ -555,17 +570,7 @@ export function MapView() {
               type="fill"
               {...filterProps(areaFilter)}
               paint={{
-                "fill-color": [
-                  "match",
-                  ["get", "hazard"],
-                  "Rendah",
-                  FLOOD_COLORS.Rendah,
-                  "Sedang",
-                  FLOOD_COLORS.Sedang,
-                  "Tinggi",
-                  FLOOD_COLORS.Tinggi,
-                  FLOOD_COLORS.Sedang,
-                ],
+                "fill-color": FLOOD_FILL_COLOR,
                 "fill-opacity": opacity.flood,
               }}
             />
@@ -597,47 +602,7 @@ export function MapView() {
                 type="fill"
                 {...filterProps(areaFilter)}
                 paint={{
-                  "fill-color": [
-                    "match",
-                    ["get", factor.property],
-                    "Empang",
-                    "#7cc7d9",
-                    "Lahan Kosong",
-                    "#e8d8b7",
-                    "Perkebunan/kebun",
-                    "#79a98b",
-                    "Permukiman",
-                    "#d99a9a",
-                    "Sawah Irigasi",
-                    "#a7d3b3",
-                    "Sawah Tadah Hujan",
-                    "#e7dfb1",
-                    "Semak Belukar",
-                    "#9cbf8d",
-                    "Sungai",
-                    "#5f9fc9",
-                    "Tegalan",
-                    "#c4a982",
-                    "0-8%",
-                    "#d9eff8",
-                    "8-15%",
-                    "#68b9d6",
-                    ">15%",
-                    "#0b5e7a",
-                    "0-25",
-                    "#e6f2f7",
-                    "25-100",
-                    "#79b6d9",
-                    ">100",
-                    "#0a4c72",
-                    "0-50 m",
-                    "#e8f7f8",
-                    "50-100 m",
-                    "#58c7d1",
-                    ">100 m",
-                    "#0a6b73",
-                    "#bfdeef",
-                  ],
+                  "fill-color": factorFillColor(factor.id),
                   "fill-opacity": opacity[factor.id],
                 }}
               />
@@ -672,6 +637,10 @@ export function MapView() {
           );
         })}
 
+        {layers.roads && data.roads && (
+          <RoadLayers data={data.roads} opacity={opacity.roads} />
+        )}
+
         {layers.admin &&
           data.admin?.features.map((feature) => {
             const center = feature.properties.center;
@@ -685,8 +654,8 @@ export function MapView() {
                 offset={ADMIN_LABEL_OFFSETS[feature.properties.id] ?? [0, 0]}
               >
                 <div className="pointer-events-none flex -translate-y-1 items-center gap-1.5 rounded-full border border-white/75 bg-white/75 px-2 py-1 shadow-[0_4px_14px_-6px_rgba(4,30,51,.4)] backdrop-blur">
-                  <span className="h-1.5 w-1.5 rounded-full bg-ocean-700" />
-                  <span className="whitespace-nowrap text-[7.5px] font-extrabold uppercase tracking-[0.13em] text-ocean-900 sm:text-[8px]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#8a5a44]" />
+                  <span className="whitespace-nowrap text-[7.5px] font-extrabold uppercase tracking-[0.13em] text-[#332b26] sm:text-[8px]">
                     {feature.properties.kecamatan}
                   </span>
                 </div>
@@ -697,14 +666,15 @@ export function MapView() {
 
       {hover && mapReady && <FeatureTooltip hover={hover} />}
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-ocean-950/12 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-[#1f1a17]/10 to-transparent" />
 
       {!layers.priority &&
         !layers.flood &&
         !layers.landcover &&
         !layers.slope &&
         !layers.elevation &&
-        !layers.river && (
+        !layers.river &&
+        !layers.roads && (
           <div className="absolute left-1/2 top-24 z-20 -translate-x-1/2">
             <button
               type="button"
@@ -717,7 +687,7 @@ export function MapView() {
           </div>
         )}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-ocean-950/12 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-[#1f1a17]/10 to-transparent" />
 
       <div className="pointer-events-auto absolute bottom-4 left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/70 bg-white/72 px-3 py-1.5 text-[8.5px] text-ink-faint shadow-sm backdrop-blur sm:flex">
         <span className="font-semibold uppercase tracking-[0.12em] text-ink-soft">
@@ -729,7 +699,7 @@ export function MapView() {
           dangerouslySetInnerHTML={{ __html: BASEMAPS[basemap].attribution }}
         />
         <span className="h-1 w-1 rounded-full bg-mist-300" />
-        <span>Data analisis BGI Cirebon</span>
+        <span>Data BGI Cirebon · Jalan RBI 25K</span>
       </div>
 
       <MapControls mapRef={mapRef} />
