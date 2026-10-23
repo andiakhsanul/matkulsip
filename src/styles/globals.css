@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-ink: #06283d;
+  --color-ink-soft: #52728a;
+  --color-ink-faint: #7d97aa;
+  --color-ocean-950: #041e33;
+  --color-ocean-900: #05263c;
+  --color-ocean-800: #07344f;
+  --color-ocean-700: #0a4c72;
+  --color-blue-700: #0a4f94;
+  --color-blue-600: #0b63b8;
+  --color-blue-500: #1683e8;
+  --color-blue-400: #46a6ff;
+  --color-aqua-500: #12a6b8;
+  --color-aqua-400: #18b6c9;
+  --color-aqua-300: #5ed6e2;
+  --color-mist-50: #f5fafe;
+  --color-mist-100: #e9f4fb;
+  --color-mist-200: #d7eaf7;
+  --color-mist-300: #bfdeef;
+  --color-sea-glass: #d7eaf7;
+  --color-amber-500: #f2a93b;
+  --color-amber-400: #f7bf68;
+  --color-coral-500: #e4572e;
+  --color-emerald-600: #157a63;
+
+  --shadow-panel: 0 24px 80px -24px rgba(6, 40, 61, 0.35), 0 2px 8px -2px rgba(6, 40, 61, 0.08);
+  --shadow-card: 0 12px 40px -18px rgba(6, 40, 61, 0.24);
+  --shadow-float: 0 18px 50px -20px rgba(4, 30, 51, 0.42);
+
+  --radius-panel: 30px;
+  --radius-card: 22px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-height: 100%;
+    background: var(--color-mist-50);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--color-mist-50);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100%;
+  }
+
+  ::selection {
+    background: var(--color-blue-500);
+    color: white;
+  }
+
+  button,
+  a,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue-500);
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #bfdeef transparent;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: #bfdeef;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .map-vignette {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(4, 30, 51, 0.18), transparent 48%),
+      linear-gradient(180deg, rgba(4, 30, 51, 0.12) 0%, transparent 18%);
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, #e9f4fb 25%, #f5fafe 50%, #e9f4fb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s linear infinite;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+}
+
+/* MapLibre */
+.maplibregl-map {
+  font-family: var(--font-sans) !important;
+  background: #eaf4fa;
+}
+
+.maplibregl-canvas:focus {
+  outline: none;
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact,
+.maplibregl-ctrl-attrib {
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  color: #52728a !important;
+  font-family: var(--font-sans) !important;
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+  padding: 4px 8px !important;
+  box-shadow: 0 6px 18px -8px rgba(6, 40, 61, 0.25) !important;
+  backdrop-filter: blur(10px);
+}
+
+.maplibregl-ctrl-attrib a {
+  color: #0b63b8 !important;
+}
+
+.maplibregl-ctrl-attrib-button {
+  background-color: transparent !important;
+}
+
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+
+/* Recharts */
+.recharts-wrapper,
+.recharts-surface {
+  font-family: var(--font-sans) !important;
+}
+
+.recharts-text {
+  fill: #52728a;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.recharts-cartesian-axis-tick-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* Leaflet is not used in the React app; legacy styles stay isolated. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
