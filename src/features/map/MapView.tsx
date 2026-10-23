@@ -523,9 +523,11 @@ export function MapView() {
               id="admin-line"
               type="line"
               paint={{
-                "line-color": "rgba(43,36,32,.52)",
+                "line-color": "#000000",
                 "line-width": 1.05,
                 "line-opacity": 0.9,
+                // Pola garis batas kecamatan SNI 6502.2:2010 (garis–titik).
+                "line-dasharray": [3, 1.3, 0.4, 1.3],
               }}
             />
           </Source>
@@ -557,7 +559,7 @@ export function MapView() {
               type="line"
               filter={hoverFilter}
               paint={{
-                "line-color": "#f2a93b",
+                "line-color": "#ff7f00",
                 "line-width": 2.4,
                 "line-opacity": 0.95,
               }}
@@ -577,7 +579,7 @@ export function MapView() {
               type="line"
               filter={selectedFilter}
               paint={{
-                "line-color": "#2f2a26",
+                "line-color": "#000000",
                 "line-width": 2.2,
                 "line-opacity": 1,
               }}
@@ -648,7 +650,7 @@ export function MapView() {
                     true,
                   ])}
                   paint={{
-                    "line-color": "#f2a93b",
+                    "line-color": "#ff7f00",
                     "line-width": 1.35,
                     "line-dasharray": [1.6, 1.2],
                     "line-opacity": 0.95,
@@ -676,8 +678,8 @@ export function MapView() {
                 offset={ADMIN_LABEL_OFFSETS[feature.properties.id] ?? [0, 0]}
               >
                 <div className="pointer-events-none flex -translate-y-1 items-center gap-1.5 rounded-full border border-white/75 bg-white/75 px-2 py-1 shadow-[0_4px_14px_-6px_rgba(4,30,51,.4)] backdrop-blur">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#8a5a44]" />
-                  <span className="whitespace-nowrap text-[7.5px] font-extrabold uppercase tracking-[0.13em] text-[#332b26] sm:text-[8px]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-black" />
+                  <span className="whitespace-nowrap text-[7.5px] font-extrabold uppercase tracking-[0.13em] text-black sm:text-[8px]">
                     {feature.properties.kecamatan}
                   </span>
                 </div>

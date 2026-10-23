@@ -12,63 +12,81 @@ export const PRIORITY_ORDER: PriorityLabel[] = [
   "Sangat Tinggi",
 ];
 
-// Palet tematik mengikuti konvensi kelas peta SNI/RBI: hijau–kuning–oranye–merah
-// untuk tingkat prioritas/bahaya, serta warna tanah untuk elevasi dan lereng.
-// Biru hanya dipakai untuk unsur air pada tutupan lahan, bukan sebagai warna kelas.
+// Palet warna mengikuti SNI 6502.2:2010 (Spesifikasi penyajian peta rupa bumi
+// skala 1:25.000). Nilai CMYK/RGB diambil dari tabel tinta cetak offset pada
+// pedoman tersebut:
+// - Tutupan lahan, perairan, jalan, dan batas administrasi memakai nilai SNI
+//   persis.
+// - SNI tidak mengatur kelas tematik (prioritas BGI, bahaya banjir, kelas
+//   lereng/elevasi/jarak sungai), sehingga kelas tersebut memakai ramp yang
+//   diturunkan dari tinta SNI: hijau (kebun/hutan), kuning-oranye kontur, dan
+//   cyan perairan.
 export const PRIORITY_COLORS: Record<PriorityLabel, string> = {
-  Rendah: "#a5d6a7",
-  Sedang: "#ffe082",
-  Tinggi: "#f4a261",
-  "Sangat Tinggi": "#c62828",
+  Rendah: "#e5ffd8",
+  Sedang: "#bfff99",
+  Tinggi: "#66cc66",
+  "Sangat Tinggi": "#1b7a3c",
 };
 
 export const PRIORITY_TEXT_COLORS: Record<PriorityLabel, string> = {
   Rendah: "#1b3a24",
-  Sedang: "#4a3200",
-  Tinggi: "#4a1f00",
-  "Sangat Tinggi": "#fff8f5",
+  Sedang: "#1b3a24",
+  Tinggi: "#0e3319",
+  "Sangat Tinggi": "#f2fff5",
 };
 
+// Bahaya banjir: rendah memakai kuning SNI (40%), sedang oranye kontur SNI,
+// tinggi merah tua konvensional peta bahaya (tidak diatur SNI).
 export const FLOOD_COLORS: Record<string, string> = {
-  Rendah: "#fff1a8",
-  Sedang: "#f59e42",
+  Rendah: "#ffff99",
+  Sedang: "#ff7f00",
   Tinggi: "#b71c1c",
 };
 
+// Tutupan lahan — nilai RGB (255) eksak dari tabel SNI 6502.2:2010:
+// permukiman 0/15/30/0, sawah 30/0/0/0 (cyan 30%), kebun 10/0/15/0,
+// hutan/semak 25/0/40/0, tegal 0/0/40/0, tanah kosong tanpa tinta, dan
+// perairan cyan 100%. Empang tidak memiliki entri khusus pada tabel yang
+// tersedia sehingga memakai cyan perairan SNI.
 export const LANDCOVER_COLORS: Record<string, string> = {
-  Empang: "#79bfd1",
-  "Lahan Kosong": "#e7dcc1",
-  "Perkebunan/kebun": "#79a862",
-  Permukiman: "#d9958c",
-  "Sawah Irigasi": "#b3d98a",
-  "Sawah Tadah Hujan": "#ded590",
-  "Semak Belukar": "#9fbe72",
-  Sungai: "#4f97bf",
-  Tegalan: "#c5a269",
+  Empang: "#00ffff",
+  "Lahan Kosong": "#ffffff",
+  "Perkebunan/kebun": "#e5ffd8",
+  Permukiman: "#ffd8b2",
+  "Sawah Irigasi": "#b2ffff",
+  "Sawah Tadah Hujan": "#b2ffff",
+  "Semak Belukar": "#bfff99",
+  Sungai: "#00ffff",
+  Tegalan: "#ffff99",
 };
 
+// Lereng dan elevasi diturunkan dari oranye kontur SNI (0/0/50/10 =
+// RGB 255/127/0): tint 30% untuk kelas rendah, tint 60% untuk kelas menengah,
+// dan oranye penuh untuk kelas tinggi.
 export const SLOPE_COLORS: Record<string, string> = {
-  "0-8%": "#f6e7b8",
-  "8-15%": "#dda15e",
-  ">15%": "#9c5a2e",
+  "0-8%": "#ffe5b3",
+  "8-15%": "#ffb266",
+  ">15%": "#ff7f00",
 };
 
 export const ELEVATION_COLORS: Record<string, string> = {
-  "0-25": "#f3e6c4",
-  "25-100": "#d4b071",
-  ">100": "#8f6238",
+  "0-25": "#fff3e6",
+  "25-100": "#ffc299",
+  ">100": "#e67300",
 };
 
+// Jarak sungai memakai tint cyan perairan SNI: 100% untuk terdekat, 60% untuk
+// menengah, dan 20% untuk terjauh.
 export const RIVER_COLORS: Record<string, string> = {
-  "0-50 m": "#2f7d32",
-  "50-100 m": "#8fbf6a",
-  ">100 m": "#e7e0c8",
+  "0-50 m": "#00ffff",
+  "50-100 m": "#99ffff",
+  ">100 m": "#ccffff",
 };
 
-// Simbol jalan mengikuti SNI 6502.2:2010: arteri/kolektor memakai magenta
-// dengan casing hitam, jalan lokal memakai garis hitam dengan casing putih,
-// sedangkan jalan lain/setapak memakai magenta muda. Warna magenta sedikit
-// digelapkan agar tetap terbaca di atas basemap terang maupun citra satelit.
+// Simbol jalan mengikuti SNI 6502.2:2010 secara eksak: arteri/kolektor
+// magenta 100% (0/60/0/0 = RGB 255/102/255) dengan casing hitam, jalan lokal
+// garis hitam dengan casing putih, serta jalan lain/setapak magenta 40%
+// (RGB 255/153/255) tanpa casing; setapak digambar putus-putus.
 export const ROAD_CLASS_ORDER: RoadClass[] = [
   "Jalan Arteri",
   "Jalan Kolektor",
@@ -78,19 +96,19 @@ export const ROAD_CLASS_ORDER: RoadClass[] = [
 ];
 
 export const ROAD_COLORS: Record<RoadClass, string> = {
-  "Jalan Arteri": "#e6007e",
-  "Jalan Kolektor": "#e6007e",
-  "Jalan Lokal": "#26221f",
-  "Jalan Lain": "#ef8ac5",
-  "Jalan Setapak": "#dca0bb",
+  "Jalan Arteri": "#ff66ff",
+  "Jalan Kolektor": "#ff66ff",
+  "Jalan Lokal": "#000000",
+  "Jalan Lain": "#ff99ff",
+  "Jalan Setapak": "#ff99ff",
 };
 
 export const ROAD_CASING_COLORS: Record<RoadClass, string> = {
-  "Jalan Arteri": "#2b2428",
-  "Jalan Kolektor": "#2b2428",
-  "Jalan Lokal": "#fffdf8",
-  "Jalan Lain": "rgba(43,36,40,.55)",
-  "Jalan Setapak": "rgba(43,36,40,.55)",
+  "Jalan Arteri": "#000000",
+  "Jalan Kolektor": "#000000",
+  "Jalan Lokal": "#ffffff",
+  "Jalan Lain": "rgba(0,0,0,0)",
+  "Jalan Setapak": "rgba(0,0,0,0)",
 };
 
 export const ROAD_LABELS: Record<RoadClass, string> = {
@@ -126,69 +144,70 @@ export const LAYER_META: Record<
       "Hasil weighted overlay empat parameter, dikelompokkan menjadi empat kelas prioritas.",
     group: "priority",
     property: "priority",
-    color: "#c62828",
+    color: "#1b7a3c",
   },
   landcover: {
     label: "Tutupan lahan",
     shortLabel: "Tutupan lahan",
     description:
-      "Jenis tutupan lahan di Kota Cirebon. Bobot 40%; skor QGIS 1–5.",
+      "Jenis tutupan lahan di Kota Cirebon, diwarnai sesuai tabel SNI 6502.2:2010. Bobot 40%; skor QGIS 1–5.",
     group: "factor",
     property: "landcover",
-    color: "#79a862",
+    color: "#66cc66",
   },
   slope: {
     label: "Kemiringan lereng",
     shortLabel: "Kemiringan",
     description:
-      "Kelas lereng 0–8%, 8–15%, dan >15%. Bobot 25%; skor 5 untuk datar, 1 untuk curam.",
+      "Kelas lereng 0–8%, 8–15%, dan >15% dengan ramp oranye kontur SNI. Bobot 25%; skor 5 untuk datar, 1 untuk curam.",
     group: "factor",
     property: "slopeClass",
-    color: "#dda15e",
+    color: "#ff7f00",
   },
   elevation: {
     label: "Ketinggian lahan",
     shortLabel: "Elevasi",
     description:
-      "Kelas elevasi 0–25 m, 25–100 m, dan >100 m. Bobot 25%; skor 5 untuk 0–25 m, 1 untuk >100 m.",
+      "Kelas elevasi 0–25 m, 25–100 m, dan >100 m dengan ramp oranye kontur SNI. Bobot 25%; skor 5 untuk 0–25 m, 1 untuk >100 m.",
     group: "factor",
     property: "elevationClass",
-    color: "#d4b071",
+    color: "#e67300",
   },
   river: {
     label: "Jarak dari sungai",
     shortLabel: "Jarak sungai",
     description:
-      "Jarak 0–50 m, 50–100 m, dan >100 m dari badan air. Bobot 10%; skor 5 untuk 0–50 m, 1 untuk >100 m.",
+      "Jarak 0–50 m, 50–100 m, dan >100 m dari badan air dengan ramp cyan perairan SNI. Bobot 10%; skor 5 untuk 0–50 m, 1 untuk >100 m.",
     group: "factor",
     property: "distanceClass",
-    color: "#2f7d32",
+    color: "#00ffff",
   },
   flood: {
     label: "Bahaya banjir",
     shortLabel: "Bahaya banjir",
     description:
-      "Layer konteks bahaya banjir; tidak termasuk empat parameter weighted overlay. Skor 5 = bahaya tinggi.",
+      "Layer konteks bahaya banjir dengan palet tematik (kuning–oranye–merah); tidak termasuk empat parameter weighted overlay. Skor 5 = bahaya tinggi.",
     group: "context",
     property: "hazard",
-    color: "#f59e42",
+    color: "#ff7f00",
   },
   roads: {
     label: "Jaringan jalan",
     shortLabel: "Jalan",
     description:
-      "Layer pendukung akses RBI 25K. Arteri/kolektor magenta, lokal hitam-putih, dan setapak magenta muda sesuai SNI 6502.2:2010; jalan rinci muncul saat diperbesar.",
+      "Layer pendukung akses RBI 25K. Arteri/kolektor magenta SNI dengan casing hitam, lokal hitam dengan casing putih, dan jalan lain/setapak magenta 40% (setapak putus-putus) sesuai SNI 6502.2:2010; jalan rinci muncul saat diperbesar.",
     group: "context",
     property: "roadClass",
-    color: "#c2185b",
+    color: "#ff66ff",
   },
   admin: {
     label: "Batas kecamatan",
     shortLabel: "Administrasi",
-    description: "Batas dan label lima kecamatan di Kota Cirebon.",
+    description:
+      "Batas kecamatan digambar garis hitam berpola dan label hitam sesuai spesifikasi batas administratif SNI 6502.2:2010.",
     group: "context",
     property: "kecamatan",
-    color: "#6b4a3a",
+    color: "#000000",
   },
 };
 

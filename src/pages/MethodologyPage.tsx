@@ -568,17 +568,22 @@ export function MethodologyPage() {
                 React, MapLibre GL, dan Vite untuk antarmuka atlas
               </div>
             </div>
-            <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-[#c2185b]/15 bg-[#c2185b]/[0.035] px-3 py-2.5">
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#c2185b]/10 text-[#a3134e]">
+            <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-[#ff66ff]/25 bg-[#ff66ff]/[0.05] px-3 py-2.5">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#ff66ff]/12 text-[#a800a8]">
                 <RoadHorizon size={14} weight="fill" />
               </span>
               <p className="text-[9.5px] leading-relaxed text-ink-soft">
                 <span className="font-semibold text-ink">Simbol peta.</span>{" "}
-                Warna tematik mengikuti konvensi SNI/RBI: hijau–kuning–oranye–merah
-                untuk prioritas, warna tanah untuk lereng/elevasi, dan biru hanya
-                untuk unsur air. Arteri/kolektor memakai magenta, lokal hitam-putih,
-                serta setapak magenta muda sesuai SNI 6502.2:2010. Tema antarmuka
-                web tetap biru.
+                Unsur rupa bumi mengikuti SNI 6502.2:2010: tutupan lahan memakai
+                tint tinta SNI (permukiman oranye 30%, sawah cyan 30%, kebun
+                hijau 30%, hutan/semak hijau 40%, tegal kuning 40%, tanah kosong
+                tanpa tinta, dan perairan cyan 100%), jalan arteri/kolektor
+                magenta dengan casing hitam, lokal hitam-putih, serta jalan
+                lain/setapak magenta 40% (setapak putus-putus), dan batas
+                kecamatan garis hitam berpola. SNI tidak mengatur kelas tematik
+                BGI, sehingga prioritas memakai ramp hijau dan bahaya banjir
+                kuning–oranye–merah sebagai palet tematik tersendiri. Tema
+                antarmuka web tetap biru.
               </p>
             </div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-mist-100 pt-3">

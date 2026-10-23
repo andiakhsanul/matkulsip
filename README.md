@@ -10,9 +10,9 @@ Atlas digital interaktif untuk membaca **prioritas pengembangan Blue-Green Infra
 
 - **Peta tematik 7 layer** — prioritas BGI, bahaya banjir, tutupan lahan, kemiringan lereng, elevasi, jarak dari sungai, dan batas kecamatan.
 - **Skor parameter 1–5 dari QGIS** — skor asli pada shapefile parameter dan bahaya banjir tampil di bagian **Parameter analisis**, legenda, tooltip peta, dan detail fitur. Skor tidak diubah atau diinventarisasi ulang.
-- **Layer pendukung jaringan jalan RBI 25K** — 883 segmen jalan Kota Cirebon dengan simbol arteri/kolektor magenta, lokal hitam-putih, serta jalan lain/setapak magenta muda mengikuti SNI 6502.2:2010. Layer jalan dapat dinyalakan tanpa mematikan layer tematik.
+- **Layer pendukung jaringan jalan RBI 25K** — 883 segmen jalan Kota Cirebon dengan simbol SNI 6502.2:2010: arteri/kolektor magenta dengan casing hitam, lokal hitam dengan casing putih, serta jalan lain/setapak magenta 40% (setapak putus-putus). Layer jalan dapat dinyalakan tanpa mematikan layer tematik.
 - **Satu layer tematik aktif** pada satu waktu agar visual tidak saling menutupi, dengan legenda dan kontrol opasitas per layer.
-- **Warna peta mengikuti konvensi SNI/RBI** — hijau–kuning–oranye–merah untuk kelas prioritas, warna tanah untuk lereng/elevasi, dan biru hanya untuk unsur air. Tema antarmuka web tetap biru.
+- **Warna peta mengikuti SNI 6502.2:2010** — tutupan lahan memakai tint tinta SNI (permukiman oranye 30%, sawah cyan 30%, kebun hijau 30%, hutan/semak hijau 40%, tegal kuning 40%, tanah kosong tanpa tinta, perairan cyan 100%), batas administrasi garis hitam berpola, dan latar terang putih kertas. Kelas tematik (prioritas, banjir, lereng, elevasi, jarak sungai) tidak diatur SNI sehingga memakai ramp yang diturunkan dari tinta SNI. Tema antarmuka web tetap biru.
 - **Filter langsung** berdasarkan kecamatan dan kelas prioritas. Ringkasan area, jumlah fitur, dan grafik ikut menyesuaikan.
 - **Tiga basemap keyless** — Terang, Satelit, dan Gelap — tanpa watermark atau API key.
 - **Detail fitur** saat diklik: kelas, skor parameter, luas, konteks kecamatan, dan catatan kualitas data.
@@ -142,12 +142,13 @@ Skor 5 pada empat parameter berarti paling mendukung BGI. Skor tersebut bukan sk
 
 ### Warna peta
 
-Warna antarmuka tetap memakai tema biru atlas. Di dalam kanvas peta, warna tematik tidak lagi memakai biru sebagai warna kelas:
+Warna antarmuka tetap memakai tema biru atlas. Di dalam kanvas peta, unsur rupa bumi mengikuti SNI 6502.2:2010 (Spesifikasi penyajian peta rupa bumi skala 1:25.000):
 
-- Prioritas dan bahaya banjir memakai urutan hijau → kuning → oranye → merah.
-- Kemiringan dan elevasi memakai gradasi tanah/okre; jarak sungai memakai hijau muda–tua.
-- Tutupan lahan mengikuti warna RBI/SNI; biru hanya dipakai untuk badan air (sungai, empang).
-- Simbol jalan mengikuti SNI 6502.2:2010: arteri/kolektor magenta dengan casing hitam, lokal hitam dengan casing putih, jalan lain/setapak magenta muda.
+- Tutupan lahan memakai tint tinta SNI: permukiman `#ffd8b2`, sawah (irigasi & tadah hujan) `#b2ffff`, kebun/perkebunan `#e5ffd8`, hutan/semak belukar `#bfff99`, tegalan `#ffff99`, tanah kosong `#ffffff`, dan perairan (sungai/empang) cyan `#00ffff`.
+- Jalan arteri/kolektor magenta SNI `#ff66ff` dengan casing hitam; jalan lokal hitam `#000000` dengan casing putih; jalan lain/setapak magenta 40% `#ff99ff` tanpa casing, dengan setapak putus-putus.
+- Batas kecamatan digambar garis hitam berpola dengan label hitam, sesuai spesifikasi batas administratif SNI.
+- SNI 6502.2:2010 tidak mengatur kelas tematik BGI, sehingga kelas analisis memakai ramp yang diturunkan dari tinta SNI: prioritas hijau bertingkat (`#e5ffd8` → `#1b7a3c`), bahaya banjir kuning → oranye → merah tua, lereng/elevasi oranye kontur `#ff7f00`, dan jarak sungai tint cyan perairan.
+- Latar basemap terang memakai putih kertas mengikuti gaya peta rupa bumi.
 
 ### Batasan
 

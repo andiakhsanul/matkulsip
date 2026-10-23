@@ -397,9 +397,10 @@ export function LayersTab() {
       <div className="flex items-start gap-2 rounded-xl bg-mist-50 px-2.5 py-2 text-[9px] leading-relaxed text-ink-soft">
         <Info size={12} className="mt-0.5 shrink-0 text-blue-600" />
         <span>
-          Warna peta mengikuti konvensi SNI (arteri/kolektor magenta, lokal
-          hitam-putih), sedangkan tema antarmuka tetap biru. Hanya satu layer
-          tematik ditampilkan pada satu waktu.{" "}
+          Unsur rupa bumi (tutupan lahan, jalan, batas, perairan) mengikuti SNI
+          6502.2:2010, sedangkan kelas tematik memakai ramp turunan tinta SNI.
+          Tema antarmuka tetap biru. Hanya satu layer tematik ditampilkan pada
+          satu waktu.{" "}
           <Link
             to="/metodologi"
             className="font-semibold text-blue-700 underline decoration-blue-700/20 underline-offset-2"

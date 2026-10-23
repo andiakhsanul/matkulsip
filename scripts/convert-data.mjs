@@ -22,10 +22,10 @@ const SCORE_DATA = JSON.parse(fs.readFileSync(SCORE_FILE, "utf8"));
 
 const PRIORITY_ORDER = ["Rendah", "Sedang", "Tinggi", "Sangat Tinggi"];
 const PRIORITY_COLORS = {
-  Rendah: "#a5d6a7",
-  Sedang: "#ffe082",
-  Tinggi: "#f4a261",
-  "Sangat Tinggi": "#c62828",
+  Rendah: "#e5ffd8",
+  Sedang: "#bfff99",
+  Tinggi: "#66cc66",
+  "Sangat Tinggi": "#1b7a3c",
 };
 
 const FILES = {

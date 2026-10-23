@@ -8,7 +8,7 @@ Dokumen ini mencatat arah visual, token, dan keputusan antarmuka atlas. Tujuanny
 
 - Peta mengisi seluruh kanvas; UI mengambang di atasnya seperti panel instrumen.
 - Antarmuka didominasi biru laut dalam, aqua, dan kabut terang, dengan aksen amber yang sangat terbatas untuk peringatan/duplikasi.
-- Warna **di dalam peta** dipisahkan dari tema UI: kelas tematik memakai palet SNI/RBI (hijau–kuning–oranye–merah, tanah, dan hijau), bukan biru. Biru hanya muncul untuk unsur air.
+- Warna **di dalam peta** dipisahkan dari tema UI: unsur rupa bumi (tutupan lahan, perairan, jalan, batas administrasi) memakai nilai SNI 6502.2:2010, sedangkan kelas tematik memakai ramp yang diturunkan dari tinta SNI (hijau, oranye kontur, cyan), bukan biru UI.
 - Permukaan dibuat berlapis: kaca, bayangan lembut, garis tipis, dan ruang kosong yang cukup.
 - Data menjadi dekorasi: angka besar, label mono, legenda warna, dan kontur tipis menjadi bahasa visual utama.
 - Tidak ada gradient dekoratif yang berlebihan, ilustrasi stok, atau kartu bertumpuk tanpa alasan.
@@ -61,24 +61,26 @@ Aturan:
 
 | Kelas | Warna peta | Peran |
 | --- | --- | --- |
-| Rendah | `#a5d6a7` | Hijau muda |
-| Sedang | `#ffe082` | Kuning |
-| Tinggi | `#f4a261` | Oranye |
-| Sangat Tinggi | `#c62828` | Merah |
+| Rendah | `#e5ffd8` | Hijau SNI tint 30% (kebun) |
+| Sedang | `#bfff99` | Hijau SNI tint 40% (hutan/semak) |
+| Tinggi | `#66cc66` | Hijau sedang |
+| Sangat Tinggi | `#1b7a3c` | Hijau gelap |
 
-Urutan ini mengikuti konvensi kelas pada peta tematik SNI/RBI: hijau untuk tingkat rendah, kuning–oranye untuk tingkat menengah, merah untuk tingkat tinggi. Palet yang sama dipakai untuk bahaya banjir dan grafik statistik agar legenda konsisten.
+Ramp hijau bertingkat dipilih karena BGI adalah infrastruktur hijau. SNI 6502.2:2010 tidak mengatur kelas tematik prioritas, sehingga ramp ini adalah palet tematik yang diturunkan dari tint tinta hijau SNI. Grafik statistik memakai palet yang sama agar legenda konsisten.
 
 ### Warna peta lainnya
 
 | Unsur | Palet |
 | --- | --- |
-| Kemiringan lereng | Kuning pasir → okrem → cokelat tanah |
-| Elevasi | Krem → tan → cokelat tua (hypsometric tint) |
-| Jarak dari sungai | Hijau tua → hijau muda → krem |
-| Tutupan lahan | Hijau sawah/kebun, cokelat tegalan, salmon permukiman, biru hanya untuk sungai/empang |
-| Jalan arteri/kolektor | Magenta `#e6007e` dengan casing hitam |
-| Jalan lokal | Hitam `#26221f` dengan casing putih |
-| Jalan lain/setapak | Magenta muda `#ef8ac5` / `#dca0bb`; setapak putus-putus |
+| Kemiringan lereng | Tint oranye kontur SNI `#ffe5b3` → `#ffb266` → `#ff7f00` |
+| Elevasi | Tint oranye kontur SNI `#fff3e6` → `#ffc299` → `#e67300` |
+| Jarak dari sungai | Tint cyan perairan SNI `#00ffff` → `#99ffff` → `#ccffff` |
+| Tutupan lahan | SNI 6502.2:2010 eksak: permukiman `#ffd8b2`, sawah `#b2ffff`, kebun `#e5ffd8`, hutan/semak `#bfff99`, tegal `#ffff99`, tanah kosong `#ffffff`, perairan `#00ffff` |
+| Jalan arteri/kolektor | Magenta SNI `#ff66ff` (0/60/0/0) dengan casing hitam |
+| Jalan lokal | Hitam `#000000` dengan casing putih |
+| Jalan lain/setapak | Magenta SNI 40% `#ff99ff` tanpa casing; setapak putus-putus |
+| Batas kecamatan | Garis hitam `#000000` berpola (garis–titik) dengan label hitam |
+| Latar terang | Putih kertas `#ffffff` mengikuti gaya peta rupa bumi |
 
 Rasio penggunaan UI yang dijaga: **90% biru/netral, 10% aksen hangat**. Amber tidak dipakai untuk elemen dekoratif; hanya untuk peringatan, catatan kualitas data, dan hover line. Rasio ini berlaku untuk antarmuka, bukan isi peta.
 
@@ -160,9 +162,9 @@ Breakpoint mengikuti Tailwind (`sm`, `md`, `lg`), dengan pengecekan `matchMedia`
 - Renderer: MapLibre GL dengan geometri GeoJSON yang sudah disederhanakan.
 - Basemap: Esri Light Gray Canvas, Esri Dark Gray Canvas, dan Esri World Imagery; label referensi ditambahkan sebagai raster terpisah untuk mode terang/gelap.
 - Semua basemap dipasang sejak awal dan diubah melalui `visibility`, sehingga pergantian basemap tidak mengubah urutan layer tematik.
-- Layer prioritas menggunakan fill + garis putih tipis; hover memakai garis amber; seleksi memakai casing putih dan garis grafit, bukan biru.
+- Layer prioritas menggunakan fill + garis putih tipis; hover memakai garis oranye kontur SNI `#ff7f00`; seleksi memakai casing putih dan garis hitam, bukan biru.
 - Layer jalan adalah layer pendukung independen: tetap tampil saat layer tematik diganti, karena tidak mengikuti aturan satu-layer-tematik. Simbol mengikuti SNI 6502.2:2010 dengan urutan gambar casing → garis. Arteri/kolektor terlihat sejak zoom luas; lokal dan setapak muncul saat peta diperbesar agar tidak memenuhi kanvas.
-- Wilayah kecamatan diberi marker label HTML dengan offset khusus untuk pusat kecamatan yang berdekatan. Label memakai tinta cokelat-grafit netral agar tidak bersaing dengan warna kelas tematik.
+- Wilayah kecamatan diberi marker label HTML dengan offset khusus untuk pusat kecamatan yang berdekatan. Label memakai tinta hitam dengan latar putih sesuai tipografi batas administratif SNI.
 - Tooltip mengikuti kursor dan dibatasi agar tidak keluar viewport; kelas, skor QGIS, dan luas ditampilkan ringkas.
 - Peta dibatasi pada bounding box Kota Cirebon; rotasi dinonaktifkan agar orientasi konsisten.
 

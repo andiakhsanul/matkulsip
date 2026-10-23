@@ -76,7 +76,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.flood.classes.map((item) => ({
       label: item.label,
       displayLabel: item.label,
-      color: FLOOD_COLORS[item.label] ?? "#e6e0d0",
+      color: FLOOD_COLORS[item.label] ?? "#f0f0f0",
       areaHa: item.areaHa,
       score: item.score,
     }));
@@ -100,7 +100,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.landcover.classes.map((item) => ({
       label: item.label,
       displayLabel: item.label,
-      color: LANDCOVER_COLORS[item.label] ?? "#e6e0d0",
+      color: LANDCOVER_COLORS[item.label] ?? "#f0f0f0",
       areaHa: item.areaHa,
       score: item.score,
     }));
@@ -109,7 +109,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.factors.slope.map((item) => ({
       label: item.label,
       displayLabel: displayClassLabel("slope", item.label),
-      color: SLOPE_COLORS[item.label] ?? "#e6e0d0",
+      color: SLOPE_COLORS[item.label] ?? "#f0f0f0",
       areaHa: item.areaHa,
       score: item.score,
     }));
@@ -118,7 +118,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.factors.elevation.map((item) => ({
       label: item.label,
       displayLabel: displayClassLabel("elevation", item.label),
-      color: ELEVATION_COLORS[item.label] ?? "#e6e0d0",
+      color: ELEVATION_COLORS[item.label] ?? "#f0f0f0",
       areaHa: item.areaHa,
       score: item.score,
     }));
@@ -127,7 +127,7 @@ export function legendForLayer(layer: LayerId, summary: SummaryData): LegendItem
     return summary.factors.riverDistance.map((item) => ({
       label: item.label,
       displayLabel: displayClassLabel("river", item.label),
-      color: RIVER_COLORS[item.label] ?? "#e6e0d0",
+      color: RIVER_COLORS[item.label] ?? "#f0f0f0",
       areaHa: item.areaHa,
       score: item.score,
     }));
@@ -206,14 +206,14 @@ export function layerSummaryValue(layer: LayerId, summary: SummaryData) {
 }
 
 export function legendColor(layer: LayerId, value: string) {
-  if (layer === "priority") return PRIORITY_COLORS[value as PriorityLabel] ?? "#e6e0d0";
-  if (layer === "flood") return FLOOD_COLORS[value] ?? "#e6e0d0";
-  if (layer === "landcover") return LANDCOVER_COLORS[value] ?? "#e6e0d0";
-  if (layer === "slope") return SLOPE_COLORS[value] ?? "#e6e0d0";
-  if (layer === "elevation") return ELEVATION_COLORS[value] ?? "#e6e0d0";
-  if (layer === "river") return RIVER_COLORS[value] ?? "#e6e0d0";
-  if (layer === "roads") return ROAD_COLORS[value as RoadClass] ?? "#c2185b";
-  return "#e6e0d0";
+  if (layer === "priority") return PRIORITY_COLORS[value as PriorityLabel] ?? "#f0f0f0";
+  if (layer === "flood") return FLOOD_COLORS[value] ?? "#f0f0f0";
+  if (layer === "landcover") return LANDCOVER_COLORS[value] ?? "#f0f0f0";
+  if (layer === "slope") return SLOPE_COLORS[value] ?? "#f0f0f0";
+  if (layer === "elevation") return ELEVATION_COLORS[value] ?? "#f0f0f0";
+  if (layer === "river") return RIVER_COLORS[value] ?? "#f0f0f0";
+  if (layer === "roads") return ROAD_COLORS[value as RoadClass] ?? "#ff66ff";
+  return "#f0f0f0";
 }
 
 export function factorColorMap(layer: FactorLayerId) {

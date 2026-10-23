@@ -21,14 +21,14 @@ export const MAP_STYLE: StyleSpecification = {
       id: "background",
       type: "background",
       paint: {
-        "background-color": "#f1efe8",
+        "background-color": "#ffffff",
       },
     },
   ],
 };
 
 export const BASEMAP_BACKGROUND: Record<string, string> = {
-  light: "#efede6",
+  light: "#ffffff",
   satellite: "#1d2b26",
   dark: "#080d11",
 };
@@ -47,27 +47,27 @@ function matchColor(
 export const PRIORITY_FILL_COLOR = matchColor(
   "priority",
   PRIORITY_COLORS as ColorMap,
-  "#d7d2c4"
+  "#e0e0e0"
 );
 
-export const FLOOD_FILL_COLOR = matchColor("hazard", FLOOD_COLORS, "#f59e42");
+export const FLOOD_FILL_COLOR = matchColor("hazard", FLOOD_COLORS, "#ff7f00");
 
 export const LANDCOVER_FILL_COLOR = matchColor(
   "landcover",
   LANDCOVER_COLORS,
-  "#ded6c3"
+  "#f0f0f0"
 );
 
-export const SLOPE_FILL_COLOR = matchColor("slopeClass", SLOPE_COLORS, "#e6e0d0");
+export const SLOPE_FILL_COLOR = matchColor("slopeClass", SLOPE_COLORS, "#f0f0f0");
 export const ELEVATION_FILL_COLOR = matchColor(
   "elevationClass",
   ELEVATION_COLORS,
-  "#e6e0d0"
+  "#f0f0f0"
 );
 export const RIVER_FILL_COLOR = matchColor(
   "distanceClass",
   RIVER_COLORS,
-  "#e6e0d0"
+  "#f0f0f0"
 );
 
 export function factorFillColor(layer: FactorLayerId) {
